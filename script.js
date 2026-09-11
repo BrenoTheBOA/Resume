@@ -69,3 +69,24 @@ if (gamesList) {
     gamesList.appendChild(project);
   });
 }
+
+const experienceFilters = document.querySelectorAll("[data-experience-filter]");
+const experienceGroups = document.querySelectorAll("[data-experience-group]");
+
+experienceFilters.forEach((button) => {
+  button.addEventListener("click", () => {
+    const filter = button.dataset.experienceFilter;
+
+    experienceFilters.forEach((item) => {
+      const isActive = item === button;
+      item.classList.toggle("is-active", isActive);
+      item.setAttribute("aria-pressed", String(isActive));
+    });
+
+    experienceGroups.forEach((group) => {
+      const categories = group.dataset.experienceGroup.split(" ");
+      const matchesGroup = filter === "all" || categories.includes(filter);
+      group.hidden = !matchesGroup;
+    });
+  });
+});
