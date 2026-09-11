@@ -90,6 +90,10 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 .project-body { padding: 22px; }
 .project-body p { color: var(--muted); font-size: 14px; }
 .project-body a { color: var(--brand); font-weight: 700; font-size: 14px; }
+.portfolio-filters { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 28px; }
+.filter-button { border: 1px solid var(--line); border-radius: 99px; padding: 9px 16px; background: #fff; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.filter-button:hover, .filter-button.is-active { border-color: var(--brand); background: var(--brand); color: #fff; }
+.project[hidden] { display: none; }
 .logo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .logo-card { display: grid; place-items: center; min-height: 120px; border: 1px solid var(--line); border-radius: 14px; color: var(--muted); font-weight: 800; background: #fff; }
 
