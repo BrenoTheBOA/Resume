@@ -106,6 +106,19 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 .portfolio-filters { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 28px; }
 .filter-button { border: 1px solid var(--line); border-radius: 99px; padding: 9px 16px; background: var(--surface); color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .filter-button:hover, .filter-button.is-active { border-color: var(--brand); background: var(--brand); color: #fff; }
+.timeline-tree-wrap { margin: 0 0 48px; padding: 22px 18px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--soft); overflow-x: auto; }
+.timeline-tree { display: block; width: 100%; min-width: 720px; height: auto; overflow: visible; }
+.tree-axis { stroke: var(--muted); stroke-width: 2; }
+.tree-tick { stroke: var(--muted); stroke-width: 1; }
+.tree-year, .tree-label { fill: var(--muted); font-family: inherit; font-size: 12px; font-weight: 700; }
+.tree-label { fill: var(--ink); font-size: 11px; font-weight: 600; }
+.tree-branch { fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.tree-branch.is-open { stroke-dasharray: 5 5; }
+.tree-start, .tree-end, .tree-end-open { stroke-width: 2; }
+.timeline-tree-legend { display: flex; flex-wrap: wrap; gap: 18px; margin: 14px 4px 0; color: var(--muted); font-size: 12px; font-weight: 700; }
+.timeline-tree-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend-line, .legend-open { display: inline-block; width: 20px; height: 3px; border-radius: 99px; background: var(--brand); }
+.legend-open { height: 12px; width: 12px; border: 2px solid var(--brand); border-radius: 50%; background: transparent; }
 .project[hidden] { display: none; }
 .game-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .game-item { display: grid; grid-template-columns: 42px 1fr; align-items: start; gap: 14px; min-height: 92px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
