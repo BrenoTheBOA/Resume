@@ -94,6 +94,11 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 .filter-button { border: 1px solid var(--line); border-radius: 99px; padding: 9px 16px; background: #fff; color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .filter-button:hover, .filter-button.is-active { border-color: var(--brand); background: var(--brand); color: #fff; }
 .project[hidden] { display: none; }
+.game-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.game-item { display: grid; grid-template-columns: 42px 1fr; align-items: start; gap: 14px; min-height: 92px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.game-number { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: var(--brand); font-size: 12px; font-weight: 800; }
+.game-item h2 { font-size: 1rem; letter-spacing: -.02em; margin: 1px 0 5px; }
+.game-item p { color: var(--muted); font-size: 12px; margin: 0; }
 .logo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .logo-card { display: grid; place-items: center; min-height: 120px; border: 1px solid var(--line); border-radius: 14px; color: var(--muted); font-weight: 800; background: #fff; }
 
@@ -118,7 +123,7 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 }
 @media (max-width: 540px) {
   h1 { font-size: 2.8rem; }
-  .portfolio-grid, .logo-grid { grid-template-columns: 1fr; }
+  .portfolio-grid, .logo-grid, .game-list { grid-template-columns: 1fr; }
   .metric-grid { grid-template-columns: 1fr; }
   .footer-content { display: block; }
   .footer-links { margin-top: 12px; }
