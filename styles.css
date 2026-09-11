@@ -107,7 +107,7 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 .filter-button { border: 1px solid var(--line); border-radius: 99px; padding: 9px 16px; background: var(--surface); color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .filter-button:hover, .filter-button.is-active { border-color: var(--brand); background: var(--brand); color: #fff; }
 .timeline-tree-wrap { margin: 0 0 48px; padding: 22px 18px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--soft); overflow-x: auto; }
-.timeline-tree { display: block; width: 100%; min-width: 520px; height: auto; overflow: visible; }
+.timeline-tree { display: block; width: 100%; min-width: 420px; height: auto; overflow: visible; }
 .tree-axis { stroke: var(--muted); stroke-width: 2; }
 .tree-tick { stroke: var(--muted); stroke-width: 1; }
 .tree-year, .tree-label { fill: var(--muted); font-family: inherit; font-size: 12px; font-weight: 700; }
