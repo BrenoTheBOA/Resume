@@ -125,40 +125,33 @@ function renderTimelineTree(filter = "all") {
   const visibleEntries = timelineEntries.filter((entry) => filter === "all" || entry.category === filter);
   const startMonth = monthValue("2007-01");
   const endMonth = monthValue("2026-09");
-  const axisX = 110;
-  const axisEndX = 930;
-  const axisWidth = axisEndX - axisX;
-  const rows = Math.max(visibleEntries.length, 1);
-  const rowHeight = 38;
-  const top = 54;
-  const height = Math.max(190, top + rows * rowHeight + 42);
+  const axisX = 500;
+  const top = 58;
+  const bottom = 665;
+  const height = 720;
   timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
 
-  const xForMonth = (value) => axisX + ((monthValue(value) - startMonth) / (endMonth - startMonth)) * axisWidth;
+  const yForMonth = (value) => top + ((monthValue(value) - startMonth) / (endMonth - startMonth)) * (bottom - top);
   const branchColor = { management: "#35d07f", games: "#71e0ff", operations: "#f2c14e" };
   const years = [2007, 2012, 2017, 2022, 2026];
-  let svg = `<line class="tree-axis" x1="${axisX}" y1="${top - 20}" x2="${axisEndX}" y2="${top - 20}" />`;
+  let svg = `<line class="tree-axis" x1="${axisX}" y1="${top}" x2="${axisX}" y2="${bottom}" />`;
   years.forEach((year) => {
-    const x = xForMonth(`${year}-01`);
-    svg += `<line class="tree-tick" x1="${x}" y1="${top - 28}" x2="${x}" y2="${top - 12}" /><text class="tree-year" x="${x}" y="${top - 36}" text-anchor="middle">${year}</text>`;
+    const y = yForMonth(`${year}-01`);
+    svg += `<line class="tree-tick" x1="${axisX - 9}" y1="${y}" x2="${axisX + 9}" y2="${y}" /><text class="tree-year" x="${axisX + 18}" y="${y + 4}" text-anchor="start">${year}</text>`;
   });
 
   visibleEntries.forEach((entry, index) => {
-    const y = top + index * rowHeight;
-    const startX = xForMonth(entry.start);
-    const endX = entry.end ? xForMonth(entry.end) : axisEndX;
+    const startY = yForMonth(entry.start);
+    const endY = entry.end ? yForMonth(entry.end) : bottom;
+    const laneX = index % 2 === 0 ? 260 : 740;
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
-    const labelAnchor = startX < axisX + 90 ? "start" : "end";
-    const labelX = labelAnchor === "start" ? startX + 8 : startX - 8;
-    const axisY = top - 20;
-    const branchY = y + 18;
-    const path = isOpen
-      ? `M ${startX} ${axisY} C ${startX} ${axisY + 16}, ${startX - 24} ${branchY}, ${startX} ${branchY} L ${endX} ${branchY}`
-      : `M ${startX} ${axisY} C ${startX} ${axisY + 16}, ${startX - 24} ${branchY}, ${startX} ${branchY} L ${endX} ${branchY} C ${endX} ${branchY - 10}, ${endX} ${axisY}, ${endX} ${axisY}`;
+    const labelAnchor = laneX < axisX ? "end" : "start";
+    const labelX = laneX < axisX ? laneX - 12 : laneX + 12;
+    const path = `M ${axisX} ${startY} C ${axisX + (laneX - axisX) * 0.35} ${startY}, ${laneX} ${startY + 8}, ${laneX} ${startY + 18} L ${laneX} ${endY - 18} C ${laneX} ${endY - 8}, ${axisX + (laneX - axisX) * 0.35} ${endY}, ${isOpen ? laneX : axisX} ${endY}`;
     svg += `<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
-    svg += `<circle class="tree-start" cx="${startX}" cy="${axisY}" r="4" fill="${color}" /><circle class="${isOpen ? "tree-end-open" : "tree-end"}" cx="${endX}" cy="${isOpen ? branchY : axisY}" r="${isOpen ? 6 : 4}" stroke="${color}" fill="${isOpen ? "none" : color}" />`;
-    svg += `<text class="tree-label" x="${labelX}" y="${y - 7}" text-anchor="${labelAnchor}">${entry.title}</text>`;
+    svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="${isOpen ? "tree-end-open" : "tree-end"}" cx="${isOpen ? laneX : axisX}" cy="${endY}" r="${isOpen ? 6 : 4}" stroke="${color}" fill="${isOpen ? "none" : color}" />`;
+    svg += `<text class="tree-label" x="${labelX}" y="${startY + 4}" text-anchor="${labelAnchor}">${entry.title}</text>`;
   });
 
   timelineTree.innerHTML = svg;
