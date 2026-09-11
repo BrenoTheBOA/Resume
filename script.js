@@ -65,7 +65,7 @@ if (gamesList) {
   gameProjects.forEach((title, index) => {
     const project = document.createElement("article");
     project.className = "game-item";
-    project.innerHTML = `<span class="game-number">${String(index + 1).padStart(2, "0")}</span><div><h2>${title}</h2><p>Descrição, função, ano e plataforma — editar este projeto.</p></div>`;
+    project.innerHTML = `<span class="game-number">${String(index + 1).padStart(2, "0")}</span><div><h2>${title}</h2><p>Description, role, year and platform — edit this project.</p></div>`;
     gamesList.appendChild(project);
   });
 }
