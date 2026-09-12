@@ -71,7 +71,7 @@ if (gamesList) {
 }
 
 const experienceFilters = document.querySelectorAll("[data-experience-filter]");
-const experienceGroups = document.querySelectorAll("[data-experience-group]");
+const experienceCards = document.querySelectorAll(".timeline-card");
 
 experienceFilters.forEach((button) => {
   button.addEventListener("click", () => {
@@ -83,10 +83,10 @@ experienceFilters.forEach((button) => {
       item.setAttribute("aria-pressed", String(isActive));
     });
 
-    experienceGroups.forEach((group) => {
-      const categories = group.dataset.experienceGroup.split(" ");
-      const matchesGroup = filter === "all" || categories.includes(filter);
-      group.hidden = !matchesGroup;
+    experienceCards.forEach((card) => {
+      const categories = card.dataset.experienceCategory.split(" ");
+      const matchesCard = filter === "all" || categories.includes(filter);
+      card.hidden = !matchesCard;
     });
 
     renderTimelineTree(filter);
@@ -111,6 +111,23 @@ const timelineEntries = [
 
 const timelineTree = document.querySelector("#timeline-tree");
 const timelineNow = new Date("2026-09-11T00:00:00");
+
+function organizeExperienceCards() {
+  const timeline = document.querySelector(".timeline");
+  if (!timeline) return;
+
+  const cards = [...timeline.querySelectorAll(".timeline-card")];
+  cards.sort((first, second) => {
+    const firstEntry = timelineEntries.find((entry) => entry.card === first.querySelector("h2")?.textContent.trim());
+    const secondEntry = timelineEntries.find((entry) => entry.card === second.querySelector("h2")?.textContent.trim());
+    const firstEnd = firstEntry?.end ? monthValue(firstEntry.end) : Number.POSITIVE_INFINITY;
+    const secondEnd = secondEntry?.end ? monthValue(secondEntry.end) : Number.POSITIVE_INFINITY;
+    return secondEnd - firstEnd;
+  });
+
+  cards.forEach((card) => timeline.appendChild(card));
+  timeline.querySelectorAll(".timeline-date-group").forEach((group) => group.remove());
+}
 
 function monthValue(value) {
   const [year, month] = value.split("-").map(Number);
@@ -224,4 +241,5 @@ timelineTree?.addEventListener("keydown", (event) => {
   }
 });
 
+organizeExperienceCards();
 renderTimelineTree();
