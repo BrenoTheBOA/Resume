@@ -123,7 +123,7 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 .tree-company:hover .tree-branch, .tree-company:focus .tree-branch, .tree-company.is-selected .tree-branch { stroke-width: 4; }
 .tree-company:hover .tree-logo, .tree-company:focus .tree-logo, .tree-company.is-selected .tree-logo { filter: drop-shadow(0 0 7px rgba(53, 208, 127, .7)); }
 .tree-company:hover .tree-label, .tree-company:focus .tree-label, .tree-company.is-selected .tree-label { fill: var(--brand); font-weight: 800; }
-.tree-branch { fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.tree-branch { fill: none; stroke-width: 2.5; stroke-linecap: butt; stroke-linejoin: round; }
 .tree-branch.is-open { stroke-dasharray: 5 5; }
 .tree-start, .tree-end, .tree-end-open { stroke-width: 2; }
 .timeline-tree-legend { display: flex; flex-wrap: wrap; gap: 18px; margin: 14px 4px 0; color: var(--muted); font-size: 12px; font-weight: 700; }

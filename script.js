@@ -125,8 +125,8 @@ function renderTimelineTree(filter = "all") {
   const endMonth = monthValue("2026-09");
   const axisX = 500;
   const top = 58;
-  const bottom = 650;
-  const height = 710;
+  const bottom = 690;
+  const height = 750;
   timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
   const yForMonth = (value) => bottom - ((monthValue(value) - startMonth) / (endMonth - startMonth)) * (bottom - top);
   const branchColor = { management: "#35d07f", games: "#71e0ff", operations: "#f2c14e" };
@@ -137,22 +137,38 @@ function renderTimelineTree(filter = "all") {
     svg += `<circle class="mindmap-year-dot" cx="${axisX}" cy="${y}" r="5" /><text class="tree-year" x="${axisX}" y="${y - 13}" text-anchor="middle">${year}</text>`;
   });
 
-  const slots = { left: [], right: [] };
+  const nodeGap = 104;
+  const laneGap = 150;
+  const sideLanes = { left: [], right: [] };
+  const nodePositions = new Map();
   visibleEntries.forEach((entry, index) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
     const side = index % 2 === 0 ? "left" : "right";
-    const sideIndex = slots[side].length;
-    slots[side].push(entry);
-    const laneX = side === "left" ? 250 - (sideIndex % 2) * 88 : 750 + (sideIndex % 2) * 88;
+    const midpoint = (startY + endY) / 2;
+    let laneIndex = sideLanes[side].findIndex((lane) => lane.every((position) => Math.abs(position - midpoint) >= nodeGap));
+    if (laneIndex === -1) laneIndex = sideLanes[side].length;
+    if (!sideLanes[side][laneIndex]) sideLanes[side][laneIndex] = [];
+    const lanePositions = sideLanes[side][laneIndex];
+    let nodeY = midpoint;
+    while (lanePositions.some((position) => Math.abs(position - nodeY) < nodeGap)) nodeY += nodeGap;
+    lanePositions.push(nodeY);
+    const laneX = side === "left" ? axisX - 205 - laneIndex * laneGap : axisX + 205 + laneIndex * laneGap;
+    nodePositions.set(entry, { side, laneX, nodeY });
+  });
+
+  const laneCount = Math.max(sideLanes.left.length, sideLanes.right.length);
+  const canvasWidth = Math.max(1000, 2 * (205 + Math.max(0, laneCount - 1) * laneGap) + 180);
+  timelineTree.setAttribute("viewBox", `0 0 ${canvasWidth} ${height}`);
+
+  visibleEntries.forEach((entry) => {
+    const startY = yForMonth(entry.start);
+    const endY = entry.end ? yForMonth(entry.end) : top;
+    const { side, laneX, nodeY } = nodePositions.get(entry);
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
-    const nodeY = (startY + endY) / 2;
     const nodeRadius = 38;
-    const curve = 72;
-    const entryPath = side === "left"
-      ? `M ${axisX} ${startY} C ${axisX - curve} ${startY}, ${laneX + curve} ${nodeY + nodeRadius}, ${laneX} ${nodeY + nodeRadius} M ${laneX} ${nodeY - nodeRadius} C ${laneX + curve} ${nodeY - nodeRadius}, ${axisX - curve} ${endY}, ${axisX} ${endY}`
-      : `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${nodeY + nodeRadius}, ${laneX} ${nodeY + nodeRadius} M ${laneX} ${nodeY - nodeRadius} C ${laneX - curve} ${nodeY - nodeRadius}, ${axisX + curve} ${endY}, ${axisX} ${endY}`;
+    const entryPath = `M ${axisX} ${startY} H ${laneX} V ${nodeY + nodeRadius} M ${laneX} ${nodeY - nodeRadius} V ${endY} H ${axisX}`;
     const logoPath = `assets/experience/${encodeURIComponent(entry.logo)}`;
     svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
     svg += `<path class="tree-branch tree-branch-start" stroke="${color}" d="${entryPath.split(" M ")[0]}" /><path class="tree-branch tree-branch-end ${isOpen ? "is-open" : ""}" stroke="${color}" d="M ${entryPath.split(" M ")[1]}" />`;
