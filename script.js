@@ -124,9 +124,9 @@ function renderTimelineTree(filter = "all") {
   const startMonth = monthValue("2007-01");
   const endMonth = monthValue("2026-09");
   const axisX = 142;
-  const top = 48;
-  const bottom = 760;
-  const height = 810;
+  const top = 34;
+  const bottom = 594;
+  const height = 640;
   const laneGap = 132;
   const laneStart = 330;
   const laneEnds = [];
@@ -174,6 +174,7 @@ function renderTimelineTree(filter = "all") {
     svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
     svg += `<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
     svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="${isOpen ? "tree-end-open" : "tree-end"}" cx="${isOpen ? laneX : axisX}" cy="${endY}" r="${isOpen ? 6 : 4}" stroke="${color}" fill="${isOpen ? "none" : color}" />`;
+    svg += `<rect class="tree-logo-mask" x="${laneX - 37}" y="${logoY - 30}" width="74" height="60" rx="16" />`;
     svg += `<image class="tree-logo" x="${laneX - 30}" y="${logoY - 21}" width="60" height="42" href="${logoPath}" preserveAspectRatio="xMidYMid meet" />`;
     svg += `</g>`;
   });
