@@ -138,7 +138,13 @@ function renderTimelineTree(filter = "all") {
     laneEnds[lane] = end;
     return lane;
   };
-  const entryLanes = new Map(visibleEntries.map((entry) => [entry, laneForEntry(entry)]));
+  const completedEntries = visibleEntries.filter((entry) => entry.end);
+  const openEntries = visibleEntries.filter((entry) => !entry.end);
+  const entryLanes = new Map(completedEntries.map((entry) => [entry, laneForEntry(entry)]));
+  openEntries.forEach((entry) => {
+    laneEnds.push(Number.POSITIVE_INFINITY);
+    entryLanes.set(entry, laneEnds.length - 1);
+  });
   const laneCount = Math.max(1, laneEnds.length);
   const canvasWidth = Math.max(1000, laneStart + laneCount * laneGap + 180);
   timelineTree.setAttribute("viewBox", `0 0 ${canvasWidth} ${height}`);
@@ -160,13 +166,15 @@ function renderTimelineTree(filter = "all") {
     const isOpen = !entry.end;
     const direction = endY < startY ? -1 : 1;
     const curve = Math.min(42, Math.max(20, Math.abs(endY - startY) * 0.16));
-    const labelY = startY + (endY - startY) * 0.5 + 4;
-    const path = `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${startY + direction * curve}, ${laneX} ${startY + direction * curve} L ${laneX} ${endY - direction * curve} C ${laneX - curve} ${endY}, ${axisX + curve} ${endY}, ${isOpen ? laneX : axisX} ${endY}`;
+    const logoY = startY + (endY - startY) * 0.5;
+    const logoTop = logoY - 27;
+    const logoBottom = logoY + 27;
+    const path = `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${logoBottom + direction * 12}, ${laneX} ${logoBottom} L ${laneX} ${logoTop} C ${laneX - curve} ${logoTop - direction * 12}, ${axisX + curve} ${endY}, ${isOpen ? laneX : axisX} ${endY}`;
     const logoPath = `assets/experience/${encodeURIComponent(entry.logo)}`;
     svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
     svg += `<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
     svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="${isOpen ? "tree-end-open" : "tree-end"}" cx="${isOpen ? laneX : axisX}" cy="${endY}" r="${isOpen ? 6 : 4}" stroke="${color}" fill="${isOpen ? "none" : color}" />`;
-    svg += `<image class="tree-logo" x="${laneX - 30}" y="${labelY - 30}" width="60" height="42" href="${logoPath}" preserveAspectRatio="xMidYMid meet" /><text class="tree-label" x="${laneX + 38}" y="${labelY + 4}" text-anchor="start">${entry.title}</text>`;
+    svg += `<image class="tree-logo" x="${laneX - 30}" y="${logoY - 21}" width="60" height="42" href="${logoPath}" preserveAspectRatio="xMidYMid meet" />`;
     svg += `</g>`;
   });
 
