@@ -138,10 +138,20 @@ function renderTimelineTree(filter = "all") {
     svg += `<line class="tree-tick" x1="${axisX - 8}" y1="${y}" x2="${axisX + 8}" y2="${y}" /><text class="tree-year" x="${axisX - 18}" y="${y + 5}" text-anchor="end">${year}</text>`;
   });
 
+  const laneEnds = [];
+  const laneForEntry = (entry) => {
+    const start = monthValue(entry.start);
+    const end = entry.end ? monthValue(entry.end) : Number.POSITIVE_INFINITY;
+    let lane = laneEnds.findIndex((lastEnd) => start > lastEnd);
+    if (lane === -1) lane = laneEnds.length;
+    laneEnds[lane] = end;
+    return lane;
+  };
+
   visibleEntries.forEach((entry, index) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
-    const laneX = 290 + (index % 4) * 145;
+    const laneX = 290 + laneForEntry(entry) * 115;
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
     const direction = endY < startY ? -1 : 1;
