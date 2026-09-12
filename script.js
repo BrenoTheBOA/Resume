@@ -94,21 +94,21 @@ experienceFilters.forEach((button) => {
 });
 
 const timelineEntries = [
-  { title: "DualCore", start: "2007-07", end: "2007-12", category: "operations" },
-  { title: "Toy Square", start: "2012-07", end: "2013-10", category: "operations" },
-  { title: "Livraria Cultura", start: "2015-02", end: "2015-08", category: "operations" },
-  { title: "BOA.Productions", start: "2018-03", end: null, category: "management" },
-  { title: "Abragames", start: "2018-03", end: "2018-07", category: "management" },
-  { title: "Flux Games", start: "2020-04", end: "2020-08", category: "games" },
-  { title: "Izyplay", start: "2020-09", end: "2021-03", category: "games" },
-  { title: "Oktagon Games", start: "2021-03", end: "2021-09", category: "games" },
-  { title: "Kokku", start: "2022-01", end: "2023-06", category: "games" },
-  { title: "Rataiada · Mentor", start: "2022-09", end: "2023-05", category: "games" },
-  { title: "Rataiada · Business", start: "2023-06", end: "2023-12", category: "management" },
-  { title: "Quinta das Baunilhas", start: "2023-10", end: "2025-05", category: "management" },
-  { title: "JGA", start: "2023-12", end: "2025-03", category: "management" },
-  { title: "Rataiada · Product", start: "2024-01", end: "2025-03", category: "games" },
-  { title: "Martins / Martins Fontes", start: "2025-10", end: "2026-06", category: "operations" }
+  { title: "DualCore", start: "2007-07", end: "2007-12", category: "operations", logo: "Dualcore.png", card: "DualCore · IT Technician" },
+  { title: "Toy Square", start: "2012-07", end: "2013-10", category: "operations", logo: "ToySquaer.png", card: "Toy Square · Store Manager" },
+  { title: "Livraria Cultura", start: "2015-02", end: "2015-08", category: "operations", logo: "Livraria Cultura.png", card: "Livraria Cultura · Book Seller" },
+  { title: "BOA.Productions", start: "2018-03", end: null, category: "management", logo: "BOA_Productions.png", card: "BOA.Productions · Project Manager, Consultant & Producer" },
+  { title: "Abragames", start: "2018-03", end: "2018-07", category: "management", logo: "Abragames.png", card: "Abragames · Event Manager & Producer" },
+  { title: "Flux Games", start: "2020-04", end: "2020-08", category: "games", logo: "Flux.png", card: "Flux Games · Game Producer & Project Manager" },
+  { title: "Izyplay", start: "2020-09", end: "2021-03", category: "games", logo: "Izyplay.png", card: "Izyplay Game Studio · Game Producer & Portfolio Manager" },
+  { title: "Oktagon Games", start: "2021-03", end: "2021-09", category: "games", logo: "Oktagon.png", card: "Oktagon Games · Game Producer & Project Manager" },
+  { title: "Kokku", start: "2022-01", end: "2023-06", category: "games", logo: "Kokku.png", card: "Kokku · Game Designer II / III" },
+  { title: "Rataiada · Mentor", start: "2022-09", end: "2023-05", category: "games", logo: "Rataiada.png", card: "Rataiada Games · Mentor" },
+  { title: "Rataiada · Business", start: "2023-06", end: "2023-12", category: "management", logo: "Rataiada.png", card: "Rataiada Games · Business Developer" },
+  { title: "Quinta das Baunilhas", start: "2023-10", end: "2025-05", category: "management", logo: "Quinta das Baunilhas.png", card: "Quinta das Baunilhas · Director, Program Management Office" },
+  { title: "JGA", start: "2023-12", end: "2025-03", category: "management", logo: "JGA.png", card: "JGA · Director, Project Management Office" },
+  { title: "Rataiada · Product", start: "2024-01", end: "2025-03", category: "games", logo: "Rataiada.png", card: "Rataiada Games · Product Owner" },
+  { title: "Martins / Martins Fontes", start: "2025-10", end: "2026-06", category: "operations", logo: "Livraria Martins Fontes.png", card: "Martins / Martins Fontes Editora · Book Seller" }
 ];
 
 const timelineTree = document.querySelector("#timeline-tree");
@@ -143,19 +143,52 @@ function renderTimelineTree(filter = "all") {
   visibleEntries.forEach((entry, index) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
-    const laneX = 280 + (index % 4) * 135;
+    const laneX = 290 + (index % 4) * 145;
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
     const direction = endY < startY ? -1 : 1;
     const curve = Math.min(38, Math.max(18, Math.abs(endY - startY) * 0.18));
     const labelY = startY + (endY - startY) * 0.5 + 4;
     const path = `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${startY + direction * curve}, ${laneX} ${startY + direction * curve} L ${laneX} ${endY - direction * curve} C ${laneX - curve} ${endY}, ${axisX + curve} ${endY}, ${isOpen ? laneX : axisX} ${endY}`;
+    const logoPath = `assets/experience/${encodeURIComponent(entry.logo)}`;
+    svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
     svg += `<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
     svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="${isOpen ? "tree-end-open" : "tree-end"}" cx="${isOpen ? laneX : axisX}" cy="${endY}" r="${isOpen ? 6 : 4}" stroke="${color}" fill="${isOpen ? "none" : color}" />`;
-    svg += `<text class="tree-label" x="${laneX + 12}" y="${labelY}" text-anchor="start">${entry.title}</text>`;
+    svg += `<image class="tree-logo" x="${laneX - 30}" y="${labelY - 28}" width="60" height="42" href="${logoPath}" preserveAspectRatio="xMidYMid meet" /><text class="tree-label" x="${laneX + 38}" y="${labelY + 4}" text-anchor="start">${entry.title}</text>`;
+    svg += `</g>`;
   });
 
   timelineTree.innerHTML = svg;
 }
+
+function selectTimelineEntry(index) {
+  const entry = timelineEntries[index];
+  if (!entry) return;
+
+  document.querySelectorAll(".tree-company").forEach((item) => {
+    item.classList.toggle("is-selected", Number(item.dataset.entryIndex) === index);
+  });
+
+  const card = [...document.querySelectorAll(".timeline-card")].find((item) => item.querySelector("h2")?.textContent.trim() === entry.card);
+  document.querySelectorAll(".timeline-card").forEach((item) => item.classList.remove("is-selected"));
+  if (card) {
+    card.classList.add("is-selected");
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+timelineTree?.addEventListener("click", (event) => {
+  const company = event.target.closest(".tree-company");
+  if (company) selectTimelineEntry(Number(company.dataset.entryIndex));
+});
+
+timelineTree?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const company = event.target.closest(".tree-company");
+  if (company) {
+    event.preventDefault();
+    selectTimelineEntry(Number(company.dataset.entryIndex));
+  }
+});
 
 renderTimelineTree();
