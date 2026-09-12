@@ -127,7 +127,10 @@ function renderTimelineTree(filter = "all") {
   const top = 48;
   const bottom = 760;
   const height = 810;
-  timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
+  const laneGap = 132;
+  const laneStart = 330;
+  const canvasWidth = Math.max(1000, laneStart + visibleEntries.length * laneGap + 180);
+  timelineTree.setAttribute("viewBox", `0 0 ${canvasWidth} ${height}`);
 
   const yForMonth = (value) => bottom - ((monthValue(value) - startMonth) / (endMonth - startMonth)) * (bottom - top);
   const branchColor = { management: "#35d07f", games: "#71e0ff", operations: "#f2c14e" };
@@ -138,31 +141,21 @@ function renderTimelineTree(filter = "all") {
     svg += `<line class="tree-tick" x1="${axisX - 8}" y1="${y}" x2="${axisX + 8}" y2="${y}" /><text class="tree-year" x="${axisX - 18}" y="${y + 5}" text-anchor="end">${year}</text>`;
   });
 
-  const laneEnds = [];
-  const laneForEntry = (entry) => {
-    const start = monthValue(entry.start);
-    const end = entry.end ? monthValue(entry.end) : Number.POSITIVE_INFINITY;
-    let lane = laneEnds.findIndex((lastEnd) => start > lastEnd);
-    if (lane === -1) lane = laneEnds.length;
-    laneEnds[lane] = end;
-    return lane;
-  };
-
   visibleEntries.forEach((entry, index) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
-    const laneX = 290 + laneForEntry(entry) * 115;
+    const laneX = laneStart + index * laneGap;
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
     const direction = endY < startY ? -1 : 1;
-    const curve = Math.min(38, Math.max(18, Math.abs(endY - startY) * 0.18));
+    const curve = Math.min(42, Math.max(20, Math.abs(endY - startY) * 0.16));
     const labelY = startY + (endY - startY) * 0.5 + 4;
     const path = `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${startY + direction * curve}, ${laneX} ${startY + direction * curve} L ${laneX} ${endY - direction * curve} C ${laneX - curve} ${endY}, ${axisX + curve} ${endY}, ${isOpen ? laneX : axisX} ${endY}`;
     const logoPath = `assets/experience/${encodeURIComponent(entry.logo)}`;
     svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
     svg += `<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
     svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="${isOpen ? "tree-end-open" : "tree-end"}" cx="${isOpen ? laneX : axisX}" cy="${endY}" r="${isOpen ? 6 : 4}" stroke="${color}" fill="${isOpen ? "none" : color}" />`;
-    svg += `<image class="tree-logo" x="${laneX - 30}" y="${labelY - 28}" width="60" height="42" href="${logoPath}" preserveAspectRatio="xMidYMid meet" /><text class="tree-label" x="${laneX + 38}" y="${labelY + 4}" text-anchor="start">${entry.title}</text>`;
+    svg += `<image class="tree-logo" x="${laneX - 30}" y="${labelY - 30}" width="60" height="42" href="${logoPath}" preserveAspectRatio="xMidYMid meet" /><text class="tree-label" x="${laneX + 38}" y="${labelY + 4}" text-anchor="start">${entry.title}</text>`;
     svg += `</g>`;
   });
 

@@ -107,13 +107,14 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 .filter-button { border: 1px solid var(--line); border-radius: 99px; padding: 9px 16px; background: var(--surface); color: var(--muted); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
 .filter-button:hover, .filter-button.is-active { border-color: var(--brand); background: var(--brand); color: #fff; }
 .timeline-tree-wrap { margin: 0 0 48px; padding: 22px 18px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--soft); overflow-x: auto; }
-.timeline-tree { display: block; width: 100%; min-width: 420px; height: auto; overflow: visible; }
+.timeline-tree { display: block; width: max-content; min-width: 100%; height: auto; overflow: visible; }
 .tree-axis { stroke: var(--muted); stroke-width: 2; }
 .tree-tick { stroke: var(--muted); stroke-width: 1; }
 .tree-year, .tree-label { fill: var(--muted); font-family: inherit; font-size: 12px; font-weight: 700; }
 .tree-label { fill: var(--ink); font-size: 11px; font-weight: 600; }
 .tree-company { cursor: pointer; outline: none; }
 .tree-company .tree-branch, .tree-company .tree-logo, .tree-company .tree-label { transition: opacity .2s ease, filter .2s ease, transform .2s ease; }
+.tree-logo { pointer-events: none; }
 .tree-company:not(:hover):not(:focus):not(.is-selected) { opacity: .78; }
 .tree-company:hover .tree-branch, .tree-company:focus .tree-branch, .tree-company.is-selected .tree-branch { stroke-width: 4; }
 .tree-company:hover .tree-logo, .tree-company:focus .tree-logo, .tree-company.is-selected .tree-logo { filter: drop-shadow(0 0 7px rgba(53, 208, 127, .7)); }
