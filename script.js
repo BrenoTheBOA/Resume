@@ -155,7 +155,7 @@ function renderTimelineTree(filter = "all") {
   });
 
   const nodeGap = 104;
-  const laneGap = 150;
+  const laneGap = 172;
   const sideLanes = { left: [], right: [] };
   const nodePositions = new Map();
   visibleEntries.forEach((entry, index) => {
@@ -163,13 +163,17 @@ function renderTimelineTree(filter = "all") {
     const endY = entry.end ? yForMonth(entry.end) : top;
     const side = index % 2 === 0 ? "left" : "right";
     const midpoint = (startY + endY) / 2;
-    let laneIndex = sideLanes[side].findIndex((lane) => lane.every((position) => Math.abs(position - midpoint) >= nodeGap));
+    const intervalStart = Math.min(startY, endY) - nodeGap / 2;
+    const intervalEnd = Math.max(startY, endY) + nodeGap / 2;
+    let laneIndex = sideLanes[side].findIndex((lane) => lane.every((interval) => (
+      intervalEnd <= interval.start || intervalStart >= interval.end
+    )));
     if (laneIndex === -1) laneIndex = sideLanes[side].length;
     if (!sideLanes[side][laneIndex]) sideLanes[side][laneIndex] = [];
-    const lanePositions = sideLanes[side][laneIndex];
+    const laneIntervals = sideLanes[side][laneIndex];
     let nodeY = midpoint;
-    while (lanePositions.some((position) => Math.abs(position - nodeY) < nodeGap)) nodeY += nodeGap;
-    lanePositions.push(nodeY);
+    while (laneIntervals.some((interval) => Math.abs(interval.node - nodeY) < nodeGap)) nodeY += nodeGap;
+    laneIntervals.push({ start: intervalStart, end: intervalEnd, node: nodeY });
     const laneX = side === "left" ? axisX - 205 - laneIndex * laneGap : axisX + 205 + laneIndex * laneGap;
     nodePositions.set(entry, { side, laneX, nodeY });
   });
