@@ -138,16 +138,17 @@ function renderTimelineTree(filter = "all") {
   if (!timelineTree) return;
 
   const visibleEntries = timelineEntries.filter((entry) => filter === "all" || entry.category === filter || entry.categories?.includes(filter));
-  const startMonth = monthValue("2007-01");
-  const endMonth = monthValue("2026-09");
+  const visibleMonths = visibleEntries.flatMap((entry) => [monthValue(entry.start), entry.end ? monthValue(entry.end) : monthValue("2026-09")]);
+  const startMonth = filter === "all" ? Math.min(...visibleMonths, monthValue("2007-01")) : Math.min(...visibleMonths);
+  const endMonth = filter === "all" ? Math.max(...visibleMonths, monthValue("2026-09")) : Math.max(...visibleMonths);
   const axisX = 500;
   const top = 58;
   const bottom = 690;
   const height = 750;
   timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
-  const yForMonth = (value) => bottom - ((monthValue(value) - startMonth) / (endMonth - startMonth)) * (bottom - top);
+  const yForMonth = (value) => bottom - ((monthValue(value) - startMonth) / Math.max(1, endMonth - startMonth)) * (bottom - top);
   const branchColor = { management: "#35d07f", games: "#71e0ff", operations: "#f2c14e" };
-  const years = [2007, 2012, 2017, 2022, 2026];
+  const years = [...new Set(visibleEntries.flatMap((entry) => [entry.start.slice(0, 4), entry.end?.slice(0, 4)]).filter(Boolean))].sort((first, second) => Number(first) - Number(second));
   let svg = `<line class="tree-axis mindmap-spine" x1="${axisX}" y1="${top}" x2="${axisX}" y2="${bottom}" />`;
   years.forEach((year) => {
     const y = yForMonth(`${year}-01`);
@@ -155,7 +156,7 @@ function renderTimelineTree(filter = "all") {
   });
 
   const nodeGap = 104;
-  const laneGap = 122;
+  const laneGap = 96;
   const sideLanes = { left: [], right: [] };
   const nodePositions = new Map();
   visibleEntries.forEach((entry, index) => {
@@ -177,7 +178,7 @@ function renderTimelineTree(filter = "all") {
     let nodeY = midpoint;
     while (laneIntervals.some((interval) => Math.abs(interval.node - nodeY) < nodeGap)) nodeY += nodeGap;
     laneIntervals.push({ start: intervalStart, end: intervalEnd, node: nodeY });
-    const laneOffset = 145;
+    const laneOffset = 92;
     const laneX = side === "left" ? axisX - laneOffset - laneIndex * laneGap : axisX + laneOffset + laneIndex * laneGap;
     nodePositions.set(entry, { side, laneX, nodeY });
   });
