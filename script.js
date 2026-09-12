@@ -168,18 +168,22 @@ function renderTimelineTree(filter = "all") {
     let laneIndex = sideLanes[side].findIndex((lane) => lane.every((interval) => (
       intervalEnd <= interval.start || intervalStart >= interval.end
     )));
+    if (entry.title === "BOA.Productions") {
+      laneIndex = Math.max(laneIndex, 2);
+    }
     if (laneIndex === -1) laneIndex = sideLanes[side].length;
     if (!sideLanes[side][laneIndex]) sideLanes[side][laneIndex] = [];
     const laneIntervals = sideLanes[side][laneIndex];
     let nodeY = midpoint;
     while (laneIntervals.some((interval) => Math.abs(interval.node - nodeY) < nodeGap)) nodeY += nodeGap;
     laneIntervals.push({ start: intervalStart, end: intervalEnd, node: nodeY });
-    const laneX = side === "left" ? axisX - 205 - laneIndex * laneGap : axisX + 205 + laneIndex * laneGap;
+    const laneOffset = 150;
+    const laneX = side === "left" ? axisX - laneOffset - laneIndex * laneGap : axisX + laneOffset + laneIndex * laneGap;
     nodePositions.set(entry, { side, laneX, nodeY });
   });
 
   const laneCount = Math.max(sideLanes.left.length, sideLanes.right.length);
-  const canvasWidth = Math.max(1000, 2 * (205 + Math.max(0, laneCount - 1) * laneGap) + 180);
+  const canvasWidth = Math.max(1000, 2 * (150 + Math.max(0, laneCount - 1) * laneGap) + 180);
   timelineTree.setAttribute("viewBox", `0 0 ${canvasWidth} ${height}`);
 
   visibleEntries.forEach((entry) => {
