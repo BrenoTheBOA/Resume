@@ -146,9 +146,32 @@ function renderTimelineTree(filter = "all") {
   const bottom = 690;
   const height = 750;
   timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
-  const yForMonth = (value) => bottom - ((monthValue(value) - startMonth) / Math.max(1, endMonth - startMonth)) * (bottom - top);
+  const eventMonths = [...new Set(visibleEntries.flatMap((entry) => [
+    monthValue(entry.start),
+    entry.end ? monthValue(entry.end) : endMonth
+  ]))].sort((first, second) => first - second);
+  const eventPositions = new Map();
+  const minEventGap = 28;
+  eventMonths.forEach((month, index) => {
+    const naturalY = bottom - ((month - startMonth) / Math.max(1, endMonth - startMonth)) * (bottom - top);
+    const previousY = index ? eventPositions.get(eventMonths[index - 1]) : bottom;
+    eventPositions.set(month, Math.min(naturalY, previousY - minEventGap));
+  });
+  const firstEventY = eventPositions.get(eventMonths[eventMonths.length - 1]);
+  const lastEventY = eventPositions.get(eventMonths[0]);
+  const yForMonth = (value) => {
+    const month = monthValue(value);
+    if (eventPositions.has(month)) return eventPositions.get(month);
+    const next = eventMonths.find((eventMonth) => eventMonth > month);
+    const previous = [...eventMonths].reverse().find((eventMonth) => eventMonth < month);
+    if (!next || !previous) return month > eventMonths[eventMonths.length - 1] ? firstEventY : lastEventY;
+    const progress = (month - previous) / (next - previous);
+    return eventPositions.get(previous) + (eventPositions.get(next) - eventPositions.get(previous)) * progress;
+  };
   const branchColor = { management: "#35d07f", games: "#71e0ff", operations: "#f2c14e" };
-  const years = [...new Set(visibleEntries.flatMap((entry) => [entry.start.slice(0, 4), entry.end?.slice(0, 4)]).filter(Boolean))].sort((first, second) => Number(first) - Number(second));
+  const years = [...new Set(visibleEntries.flatMap((entry) => [entry.start.slice(0, 4), entry.end?.slice(0, 4)]).filter(Boolean))]
+    .sort((first, second) => Number(first) - Number(second))
+    .filter((year, index, allYears) => index === 0 || Math.abs(yForMonth(`${year}-01`) - yForMonth(`${allYears[index - 1]}-01`)) >= 26);
   let svg = `<line class="tree-axis mindmap-spine" x1="${axisX}" y1="${top}" x2="${axisX}" y2="${bottom}" />`;
   years.forEach((year) => {
     const y = yForMonth(`${year}-01`);
@@ -156,7 +179,7 @@ function renderTimelineTree(filter = "all") {
   });
 
   const nodeGap = 104;
-  const laneGap = 112;
+  const laneGap = 75;
   const sideLanes = { left: [], right: [] };
   const nodePositions = new Map();
   const durationOf = (entry) => (entry.end ? monthValue(entry.end) : endMonth) - monthValue(entry.start);
@@ -183,8 +206,9 @@ function renderTimelineTree(filter = "all") {
     let nodeY = midpoint;
     while (laneIntervals.some((interval) => Math.abs(interval.node - nodeY) < nodeGap)) nodeY += nodeGap;
     laneIntervals.push({ start: intervalStart, end: intervalEnd, node: nodeY });
-    const laneOffset = 92;
-    const laneX = side === "left" ? axisX - laneOffset - laneIndex * laneGap : axisX + laneOffset + laneIndex * laneGap;
+    const laneOffset = 100;
+    const boundedLane = Math.min(laneIndex, 3);
+    const laneX = side === "left" ? axisX - laneOffset - boundedLane * laneGap : axisX + laneOffset + boundedLane * laneGap;
     nodePositions.set(entry, { side, laneX, nodeY });
   });
 
