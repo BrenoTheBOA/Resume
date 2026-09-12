@@ -151,11 +151,9 @@ function renderTimelineTree(filter = "all") {
     entry.end ? monthValue(entry.end) : endMonth
   ]))].sort((first, second) => first - second);
   const eventPositions = new Map();
-  const minEventGap = 28;
+  const eventSpan = Math.max(1, eventMonths.length - 1);
   eventMonths.forEach((month, index) => {
-    const naturalY = bottom - ((month - startMonth) / Math.max(1, endMonth - startMonth)) * (bottom - top);
-    const previousY = index ? eventPositions.get(eventMonths[index - 1]) : bottom;
-    eventPositions.set(month, Math.min(naturalY, previousY - minEventGap));
+    eventPositions.set(month, bottom - (index / eventSpan) * (bottom - top));
   });
   const firstEventY = eventPositions.get(eventMonths[eventMonths.length - 1]);
   const lastEventY = eventPositions.get(eventMonths[0]);
@@ -203,8 +201,17 @@ function renderTimelineTree(filter = "all") {
     if (laneIndex === -1) laneIndex = sideLanes[side].length;
     if (!sideLanes[side][laneIndex]) sideLanes[side][laneIndex] = [];
     const laneIntervals = sideLanes[side][laneIndex];
-    let nodeY = midpoint;
-    while (laneIntervals.some((interval) => Math.abs(interval.node - nodeY) < nodeGap)) nodeY += nodeGap;
+    const baseY = Math.max(top + nodeGap / 2, Math.min(bottom - nodeGap / 2, midpoint));
+    const candidates = [baseY];
+    for (let step = nodeGap; step <= bottom - top; step += nodeGap) {
+      candidates.push(baseY + step, baseY - step);
+    }
+    const availableY = candidates.find((candidate) => (
+      candidate >= top + nodeGap / 2
+      && candidate <= bottom - nodeGap / 2
+      && laneIntervals.every((interval) => Math.abs(interval.node - candidate) >= nodeGap)
+    ));
+    const nodeY = availableY ?? baseY;
     laneIntervals.push({ start: intervalStart, end: intervalEnd, node: nodeY });
     const laneOffset = 100;
     const boundedLane = Math.min(laneIndex, 3);
@@ -214,6 +221,7 @@ function renderTimelineTree(filter = "all") {
 
   timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
 
+  let nodeMarkup = "";
   visibleEntries.forEach((entry) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
@@ -225,11 +233,13 @@ function renderTimelineTree(filter = "all") {
     const logoPath = `assets/experience/${encodeURIComponent(entry.logo)}`;
     svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
     svg += `<path class="tree-branch tree-branch-start" stroke="${color}" d="${entryPath.split(" M ")[0]}" /><path class="tree-branch tree-branch-end ${isOpen ? "is-open" : ""}" stroke="${color}" d="M ${entryPath.split(" M ")[1]}" />`;
-    svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="tree-end ${isOpen ? "tree-end-open" : ""}" cx="${axisX}" cy="${endY}" r="4" stroke="${color}" fill="${isOpen ? "none" : color}" /><circle class="mindmap-node" cx="${laneX}" cy="${nodeY}" r="${nodeRadius}" stroke="${color}" />`;
-    svg += `<image class="tree-logo" x="${laneX - 29}" y="${nodeY - 29}" width="58" height="58" href="${logoPath}" preserveAspectRatio="xMidYMid meet" />`;
     svg += `</g>`;
+    nodeMarkup += `<g class="tree-company tree-company-node" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
+    nodeMarkup += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="tree-end ${isOpen ? "tree-end-open" : ""}" cx="${axisX}" cy="${endY}" r="4" stroke="${color}" fill="${isOpen ? "none" : color}" /><circle class="mindmap-node" cx="${laneX}" cy="${nodeY}" r="${nodeRadius}" stroke="${color}" />`;
+    nodeMarkup += `<image class="tree-logo" x="${laneX - 29}" y="${nodeY - 29}" width="58" height="58" href="${logoPath}" preserveAspectRatio="xMidYMid meet" /></g>`;
   });
 
+  svg += nodeMarkup;
   timelineTree.innerHTML = svg;
 }
 
