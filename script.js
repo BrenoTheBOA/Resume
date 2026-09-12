@@ -103,11 +103,9 @@ const timelineEntries = [
   { title: "Izyplay", start: "2020-09", end: "2021-03", category: "games", logo: "Izyplay.png", card: "Izyplay Game Studio · Game Producer & Portfolio Manager" },
   { title: "Oktagon Games", start: "2021-03", end: "2021-09", category: "games", logo: "Oktagon.png", card: "Oktagon Games · Game Producer & Project Manager" },
   { title: "Kokku", start: "2022-01", end: "2023-06", category: "games", logo: "Kokku.png", card: "Kokku · Game Designer II / III" },
-  { title: "Rataiada · Mentor", start: "2022-09", end: "2023-05", category: "games", logo: "Rataiada.png", card: "Rataiada Games · Mentor" },
-  { title: "Rataiada · Business", start: "2023-06", end: "2023-12", category: "management", logo: "Rataiada.png", card: "Rataiada Games · Business Developer" },
+  { title: "Rataiada Games", start: "2022-09", end: "2025-03", category: "games", categories: ["games", "management"], logo: "Rataiada.png", card: "Rataiada Games · Mentor, Business Developer & Product Owner" },
   { title: "Quinta das Baunilhas", start: "2023-10", end: "2025-05", category: "management", logo: "Quinta das Baunilhas.png", card: "Quinta das Baunilhas · Director, Program Management Office" },
   { title: "JGA", start: "2023-12", end: "2025-03", category: "management", logo: "JGA.png", card: "JGA · Director, Project Management Office" },
-  { title: "Rataiada · Product", start: "2024-01", end: "2025-03", category: "games", logo: "Rataiada.png", card: "Rataiada Games · Product Owner" },
   { title: "Martins / Martins Fontes", start: "2025-10", end: "2026-06", category: "operations", logo: "Livraria Martins Fontes.png", card: "Martins / Martins Fontes Editora · Book Seller" }
 ];
 
@@ -122,7 +120,7 @@ function monthValue(value) {
 function renderTimelineTree(filter = "all") {
   if (!timelineTree) return;
 
-  const visibleEntries = timelineEntries.filter((entry) => filter === "all" || entry.category === filter);
+  const visibleEntries = timelineEntries.filter((entry) => filter === "all" || entry.category === filter || entry.categories?.includes(filter));
   const startMonth = monthValue("2007-01");
   const endMonth = monthValue("2026-09");
   const axisX = 142;
