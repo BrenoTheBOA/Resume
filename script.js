@@ -165,7 +165,7 @@ function renderTimelineTree(filter = "all") {
     const midpoint = (startY + endY) / 2;
     const intervalStart = Math.min(startY, endY) - nodeGap / 2;
     const intervalEnd = Math.max(startY, endY) + nodeGap / 2;
-    let laneIndex = sideLanes[side].findIndex((lane) => lane.every((interval) => (
+    let laneIndex = sideLanes[side].findIndex((lane) => lane && lane.every((interval) => (
       intervalEnd <= interval.start || intervalStart >= interval.end
     )));
     if (entry.title === "BOA.Productions") {
