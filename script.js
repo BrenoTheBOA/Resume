@@ -129,7 +129,18 @@ function renderTimelineTree(filter = "all") {
   const height = 810;
   const laneGap = 132;
   const laneStart = 330;
-  const canvasWidth = Math.max(1000, laneStart + visibleEntries.length * laneGap + 180);
+  const laneEnds = [];
+  const laneForEntry = (entry) => {
+    const start = monthValue(entry.start);
+    const end = entry.end ? monthValue(entry.end) : Number.POSITIVE_INFINITY;
+    let lane = laneEnds.findIndex((lastEnd) => start >= lastEnd);
+    if (lane === -1) lane = laneEnds.length;
+    laneEnds[lane] = end;
+    return lane;
+  };
+  const entryLanes = new Map(visibleEntries.map((entry) => [entry, laneForEntry(entry)]));
+  const laneCount = Math.max(1, laneEnds.length);
+  const canvasWidth = Math.max(1000, laneStart + laneCount * laneGap + 180);
   timelineTree.setAttribute("viewBox", `0 0 ${canvasWidth} ${height}`);
 
   const yForMonth = (value) => bottom - ((monthValue(value) - startMonth) / (endMonth - startMonth)) * (bottom - top);
@@ -144,7 +155,7 @@ function renderTimelineTree(filter = "all") {
   visibleEntries.forEach((entry, index) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
-    const laneX = laneStart + index * laneGap;
+    const laneX = laneStart + entryLanes.get(entry) * laneGap;
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
     const direction = endY < startY ? -1 : 1;
