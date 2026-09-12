@@ -155,7 +155,7 @@ function renderTimelineTree(filter = "all") {
   });
 
   const nodeGap = 104;
-  const laneGap = 172;
+  const laneGap = 122;
   const sideLanes = { left: [], right: [] };
   const nodePositions = new Map();
   visibleEntries.forEach((entry, index) => {
@@ -177,14 +177,12 @@ function renderTimelineTree(filter = "all") {
     let nodeY = midpoint;
     while (laneIntervals.some((interval) => Math.abs(interval.node - nodeY) < nodeGap)) nodeY += nodeGap;
     laneIntervals.push({ start: intervalStart, end: intervalEnd, node: nodeY });
-    const laneOffset = 150;
+    const laneOffset = 145;
     const laneX = side === "left" ? axisX - laneOffset - laneIndex * laneGap : axisX + laneOffset + laneIndex * laneGap;
     nodePositions.set(entry, { side, laneX, nodeY });
   });
 
-  const laneCount = Math.max(sideLanes.left.length, sideLanes.right.length);
-  const canvasWidth = Math.max(1000, 2 * (150 + Math.max(0, laneCount - 1) * laneGap) + 180);
-  timelineTree.setAttribute("viewBox", `0 0 ${canvasWidth} ${height}`);
+  timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
 
   visibleEntries.forEach((entry) => {
     const startY = yForMonth(entry.start);
