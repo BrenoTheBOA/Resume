@@ -175,6 +175,20 @@ function selectTimelineEntry(index) {
   }
 }
 
+document.querySelectorAll(".timeline-card").forEach((card) => {
+  const title = card.querySelector("h2");
+  const entry = timelineEntries.find((item) => item.card === title?.textContent.trim());
+  if (!entry || !title) return;
+
+  const logo = document.createElement("img");
+  logo.className = "timeline-card-logo";
+  logo.src = `assets/experience/${encodeURIComponent(entry.logo)}`;
+  logo.alt = `${entry.title} logo`;
+  logo.width = 56;
+  logo.height = 56;
+  title.before(logo);
+});
+
 timelineTree?.addEventListener("click", (event) => {
   const company = event.target.closest(".tree-company");
   if (company) selectTimelineEntry(Number(company.dataset.entryIndex));
