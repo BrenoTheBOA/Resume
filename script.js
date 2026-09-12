@@ -123,79 +123,41 @@ function renderTimelineTree(filter = "all") {
   const visibleEntries = timelineEntries.filter((entry) => filter === "all" || entry.category === filter || entry.categories?.includes(filter));
   const startMonth = monthValue("2007-01");
   const endMonth = monthValue("2026-09");
-  const axisX = 142;
-  const top = 34;
-  const bottom = 594;
-  const height = 640;
-  const laneGap = 148;
-  const laneStart = 330;
-  const laneEnds = [];
-  const laneForEntry = (entry) => {
-    const start = monthValue(entry.start);
-    const end = entry.end ? monthValue(entry.end) + 2 : Number.POSITIVE_INFINITY;
-    let lane = laneEnds.findIndex((lastEnd) => start >= lastEnd);
-    if (lane === -1) lane = laneEnds.length;
-    laneEnds[lane] = end;
-    return lane;
-  };
-  const completedEntries = visibleEntries.filter((entry) => entry.end);
-  const openEntries = visibleEntries.filter((entry) => !entry.end);
-  const entryLanes = new Map(completedEntries.map((entry) => [entry, laneForEntry(entry)]));
-  openEntries.forEach((entry) => {
-    laneEnds.push(Number.POSITIVE_INFINITY);
-    entryLanes.set(entry, laneEnds.length - 1);
-  });
-  const laneCount = Math.max(1, laneEnds.length);
-  const canvasWidth = Math.max(1000, laneStart + laneCount * laneGap + 180);
-  timelineTree.setAttribute("viewBox", `0 0 ${canvasWidth} ${height}`);
-
-  const timelineStops = [
-    { month: startMonth, weight: 0 },
-    { month: monthValue("2012-01"), weight: 0.58 },
-    { month: monthValue("2017-01"), weight: 1.28 },
-    { month: monthValue("2022-01"), weight: 2.15 },
-    { month: endMonth, weight: 3.15 }
-  ];
-  const yForMonth = (value) => {
-    const month = monthValue(value);
-    let lower = timelineStops[0];
-    let upper = timelineStops[timelineStops.length - 1];
-    for (let index = 1; index < timelineStops.length; index += 1) {
-      if (month <= timelineStops[index].month) {
-        upper = timelineStops[index];
-        lower = timelineStops[index - 1];
-        break;
-      }
-    }
-    const progress = (month - lower.month) / (upper.month - lower.month);
-    const weighted = lower.weight + progress * (upper.weight - lower.weight);
-    return bottom - (weighted / timelineStops[timelineStops.length - 1].weight) * (bottom - top);
-  };
+  const axisX = 500;
+  const top = 58;
+  const bottom = 650;
+  const height = 710;
+  timelineTree.setAttribute("viewBox", `0 0 1000 ${height}`);
+  const yForMonth = (value) => bottom - ((monthValue(value) - startMonth) / (endMonth - startMonth)) * (bottom - top);
   const branchColor = { management: "#35d07f", games: "#71e0ff", operations: "#f2c14e" };
   const years = [2007, 2012, 2017, 2022, 2026];
-  let svg = `<line class="tree-axis" x1="${axisX}" y1="${top}" x2="${axisX}" y2="${bottom}" />`;
+  let svg = `<line class="tree-axis mindmap-spine" x1="${axisX}" y1="${top}" x2="${axisX}" y2="${bottom}" />`;
   years.forEach((year) => {
     const y = yForMonth(`${year}-01`);
-    svg += `<line class="tree-tick" x1="${axisX - 8}" y1="${y}" x2="${axisX + 8}" y2="${y}" /><text class="tree-year" x="${axisX - 18}" y="${y + 5}" text-anchor="end">${year}</text>`;
+    svg += `<circle class="mindmap-year-dot" cx="${axisX}" cy="${y}" r="5" /><text class="tree-year" x="${axisX}" y="${y - 13}" text-anchor="middle">${year}</text>`;
   });
 
+  const slots = { left: [], right: [] };
   visibleEntries.forEach((entry, index) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
-    const laneX = laneStart + entryLanes.get(entry) * laneGap;
+    const side = index % 2 === 0 ? "left" : "right";
+    const sideIndex = slots[side].length;
+    slots[side].push(entry);
+    const laneX = side === "left" ? 250 - (sideIndex % 2) * 88 : 750 + (sideIndex % 2) * 88;
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
-    const curve = Math.min(42, Math.max(20, Math.abs(endY - startY) * 0.16));
-    const logoY = startY + (endY - startY) * 0.5;
-    const logoLeft = laneX - 37;
-    const logoRight = laneX + 37;
-    const path = `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${logoLeft - curve} ${logoY}, ${logoLeft} ${logoY} M ${logoRight} ${logoY} C ${logoRight + curve} ${logoY}, ${axisX + curve} ${endY}, ${isOpen ? laneX : axisX} ${endY}`;
+    const nodeY = startY;
+    const curve = 72;
+    const path = side === "left"
+      ? `M ${axisX} ${startY} C ${axisX - curve} ${startY}, ${laneX + curve} ${nodeY}, ${laneX + 36} ${nodeY}`
+      : `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${nodeY}, ${laneX - 36} ${nodeY}`;
+    const duration = entry.end ? `<line class="mindmap-duration ${isOpen ? "is-open" : ""}" x1="${axisX}" y1="${startY}" x2="${axisX}" y2="${endY}" stroke="${color}" />` : "";
     const logoPath = `assets/experience/${encodeURIComponent(entry.logo)}`;
     svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
-    svg += `<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
-    svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="${isOpen ? "tree-end-open" : "tree-end"}" cx="${isOpen ? laneX : axisX}" cy="${endY}" r="${isOpen ? 6 : 4}" stroke="${color}" fill="${isOpen ? "none" : color}" />`;
-    svg += `<rect class="tree-logo-mask" x="${laneX - 37}" y="${logoY - 30}" width="74" height="60" rx="16" />`;
-    svg += `<image class="tree-logo" x="${laneX - 30}" y="${logoY - 21}" width="60" height="42" href="${logoPath}" preserveAspectRatio="xMidYMid meet" />`;
+    svg += `${duration}<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
+    svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="mindmap-node" cx="${laneX}" cy="${nodeY}" r="38" stroke="${color}" />`;
+    svg += `<image class="tree-logo" x="${laneX - 29}" y="${nodeY - 29}" width="58" height="58" href="${logoPath}" preserveAspectRatio="xMidYMid meet" />`;
     svg += `</g>`;
   });
 
