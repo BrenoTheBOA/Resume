@@ -111,8 +111,6 @@ h3 { font-size: 1.1rem; margin-bottom: 7px; }
 .tree-axis { stroke: var(--muted); stroke-width: 2; }
 .mindmap-spine { stroke: var(--brand); stroke-width: 3; opacity: .7; }
 .mindmap-year-dot { fill: var(--brand); stroke: var(--soft); stroke-width: 3; }
-.mindmap-duration { stroke-width: 7; opacity: .14; stroke-linecap: round; }
-.mindmap-duration.is-open { stroke-dasharray: 5 7; opacity: .26; }
 .mindmap-node { fill: var(--soft); stroke-width: 2; opacity: .95; }
 .tree-tick { stroke: var(--muted); stroke-width: 1; }
 .tree-year, .tree-label { fill: var(--muted); font-family: inherit; font-size: 12px; font-weight: 700; }

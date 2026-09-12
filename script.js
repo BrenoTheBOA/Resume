@@ -147,16 +147,16 @@ function renderTimelineTree(filter = "all") {
     const laneX = side === "left" ? 250 - (sideIndex % 2) * 88 : 750 + (sideIndex % 2) * 88;
     const color = branchColor[entry.category];
     const isOpen = !entry.end;
-    const nodeY = startY;
+    const nodeY = (startY + endY) / 2;
+    const nodeRadius = 38;
     const curve = 72;
-    const path = side === "left"
-      ? `M ${axisX} ${startY} C ${axisX - curve} ${startY}, ${laneX + curve} ${nodeY}, ${laneX + 36} ${nodeY}`
-      : `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${nodeY}, ${laneX - 36} ${nodeY}`;
-    const duration = entry.end ? `<line class="mindmap-duration ${isOpen ? "is-open" : ""}" x1="${axisX}" y1="${startY}" x2="${axisX}" y2="${endY}" stroke="${color}" />` : "";
+    const entryPath = side === "left"
+      ? `M ${axisX} ${startY} C ${axisX - curve} ${startY}, ${laneX + curve} ${nodeY + nodeRadius}, ${laneX} ${nodeY + nodeRadius} M ${laneX} ${nodeY - nodeRadius} C ${laneX + curve} ${nodeY - nodeRadius}, ${axisX - curve} ${endY}, ${axisX} ${endY}`
+      : `M ${axisX} ${startY} C ${axisX + curve} ${startY}, ${laneX - curve} ${nodeY + nodeRadius}, ${laneX} ${nodeY + nodeRadius} M ${laneX} ${nodeY - nodeRadius} C ${laneX - curve} ${nodeY - nodeRadius}, ${axisX + curve} ${endY}, ${axisX} ${endY}`;
     const logoPath = `assets/experience/${encodeURIComponent(entry.logo)}`;
     svg += `<g class="tree-company" data-entry-index="${timelineEntries.indexOf(entry)}" tabindex="0" role="button" aria-label="View ${entry.title}">`;
-    svg += `${duration}<path class="tree-branch ${isOpen ? "is-open" : ""}" stroke="${color}" d="${path}" />`;
-    svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="mindmap-node" cx="${laneX}" cy="${nodeY}" r="38" stroke="${color}" />`;
+    svg += `<path class="tree-branch tree-branch-start" stroke="${color}" d="${entryPath.split(" M ")[0]}" /><path class="tree-branch tree-branch-end ${isOpen ? "is-open" : ""}" stroke="${color}" d="M ${entryPath.split(" M ")[1]}" />`;
+    svg += `<circle class="tree-start" cx="${axisX}" cy="${startY}" r="4" fill="${color}" /><circle class="tree-end ${isOpen ? "tree-end-open" : ""}" cx="${axisX}" cy="${endY}" r="4" stroke="${color}" fill="${isOpen ? "none" : color}" /><circle class="mindmap-node" cx="${laneX}" cy="${nodeY}" r="${nodeRadius}" stroke="${color}" />`;
     svg += `<image class="tree-logo" x="${laneX - 29}" y="${nodeY - 29}" width="58" height="58" href="${logoPath}" preserveAspectRatio="xMidYMid meet" />`;
     svg += `</g>`;
   });
