@@ -156,22 +156,27 @@ function renderTimelineTree(filter = "all") {
   });
 
   const nodeGap = 104;
-  const laneGap = 96;
+  const laneGap = 112;
   const sideLanes = { left: [], right: [] };
   const nodePositions = new Map();
-  visibleEntries.forEach((entry, index) => {
+  const durationOf = (entry) => (entry.end ? monthValue(entry.end) : endMonth) - monthValue(entry.start);
+  const rightPriority = new Set(["BOA.Productions"]);
+  const leftPriority = new Set(["Oktagon Games", "Rataiada Games"]);
+  const orderedEntries = [...visibleEntries].sort((first, second) => durationOf(second) - durationOf(first));
+
+  orderedEntries.forEach((entry, index) => {
     const startY = yForMonth(entry.start);
     const endY = entry.end ? yForMonth(entry.end) : top;
-    const side = index % 2 === 0 ? "left" : "right";
+    const side = rightPriority.has(entry.title) ? "right"
+      : leftPriority.has(entry.title) ? "left"
+        : index % 2 === 0 ? "left" : "right";
     const midpoint = (startY + endY) / 2;
     const intervalStart = Math.min(startY, endY) - nodeGap / 2;
     const intervalEnd = Math.max(startY, endY) + nodeGap / 2;
     let laneIndex = sideLanes[side].findIndex((lane) => lane && lane.every((interval) => (
       intervalEnd <= interval.start || intervalStart >= interval.end
     )));
-    if (entry.title === "BOA.Productions") {
-      laneIndex = Math.max(laneIndex, 2);
-    }
+    if (entry.title === "BOA.Productions") laneIndex = Math.max(laneIndex, 2);
     if (laneIndex === -1) laneIndex = sideLanes[side].length;
     if (!sideLanes[side][laneIndex]) sideLanes[side][laneIndex] = [];
     const laneIntervals = sideLanes[side][laneIndex];
