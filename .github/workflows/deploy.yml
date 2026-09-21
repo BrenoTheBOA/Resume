@@ -30,6 +30,8 @@ jobs:
         run: npm install
 
       - name: Build
+        env:
+          BASE_PATH: /Resume
         run: npm run build
 
       - name: Upload Pages artifact
