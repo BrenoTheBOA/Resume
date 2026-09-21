@@ -43,7 +43,7 @@ import { experience } from "../data/experience.js";
     {projects.map((p,i)=>
       <article class:list={["work-card",i===0?"hero-card":"",i%2===0?"wide":"narrow"]} data-type={p.category}>
         <div class="project-media">
-          <img src={`${import.meta.env.BASE_URL}assets/projects/${encodeURIComponent(p.image)} alt={p.title} loading={i>1?"lazy":"eager"} />
+          <img src={`${import.meta.env.BASE_URL}assets/projects/${encodeURIComponent(p.image)}`} alt={p.title} loading={i>1?"lazy":"eager"} />
           <span class="media-shade"></span>
           <span class="tag">{p.client} · {p.role}</span>
         </div>
@@ -63,7 +63,7 @@ import { experience } from "../data/experience.js";
       <article class="event">
         <div class="date">{e.period}</div>
         <div class="event-body">
-          {e.logo && <div class="event-logo"><img src={`${import.meta.env.BASE_URL}assets/experience/${encodeURIComponent(e.logo)} alt="" loading="lazy" /></div>}
+          {e.logo && <div class="event-logo"><img src={`${import.meta.env.BASE_URL}assets/experience/${encodeURIComponent(e.logo)}`} alt="" loading="lazy" /></div>}
           <div class="event-copy"><h3>{e.company} · {e.role}</h3><p>{e.summary}</p></div>
         </div>
       </article>
@@ -86,7 +86,7 @@ import { experience } from "../data/experience.js";
     {[
       "Ubisoft.png","Paradox.png","Mattel.png","GameMill.png","Roblox.png",
       "Sony.png","Tencent.png","ByteDance.png","Nickelodeon.png","Sebrae.png"
-    ].map((logo)=><div class="client-logo"><img src={`${import.meta.env.BASE_URL}assets/clients/${encodeURIComponent(logo)} alt={logo.replace(".png","")} loading="lazy" /></div>)}
+    ].map((logo)=><div class="client-logo"><img src={`${import.meta.env.BASE_URL}assets/clients/${encodeURIComponent(logo)}`} alt={logo.replace(".png","")} loading="lazy" /></div>)}
   </div>
 </section>
 
