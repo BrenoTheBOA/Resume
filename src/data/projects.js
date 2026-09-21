@@ -1,9 +1,9 @@
 export const projects = [
-  { title:"The Division Resurgence", client:"Ubisoft", category:"games", role:"Game Production", description:"Experience within a major AAA game ecosystem and multidisciplinary production environment." },
-  { title:"Hearts of Iron IV: Trial of Allegiance", client:"Paradox Interactive", category:"games", role:"Game Production", description:"Game production experience on a major strategy franchise." },
-  { title:"Cobra Kai: The Karate Kid Saga Continues", client:"GameMill / Flux Games", category:"games", role:"Game Producer & Project Manager", description:"Managed Environment and QA teams, coordinating deliveries, software branches, risks and quality requirements." },
-  { title:"Age of Rivals: Conquest", client:"Mattel / Oktagon Games", category:"games", role:"Game Producer & Project Manager", description:"Managed production workflows and live operations, facilitating sprints, retrospectives, scope, capacity and risk management." },
-  { title:"So Fart Away", client:"Rataiada Games", category:"production", role:"Mentor · Business Developer · Product Owner", description:"Supported the indie team across mentoring, game design, production, business development and product ownership." }
+  { title:"The Division Resurgence", client:"Ubisoft", category:"games", role:"Game Production", image:"The Division Resurgence.png", description:"Experience within a major AAA game ecosystem and multidisciplinary production environment." },
+  { title:"Hearts of Iron IV: Trial of Allegiance", client:"Paradox Interactive", category:"games", role:"Game Production", image:"Heats of Iron IV Trial of Allegiance.png", description:"Game production experience on a major strategy franchise." },
+  { title:"Cobra Kai: The Karate Kid Saga Continues", client:"GameMill / Flux Games", category:"games", role:"Game Producer & Project Manager", image:"Cobra Kai The Karate Kid Saga Continues.png", description:"Managed Environment and QA teams, coordinating deliveries, software branches, risks and quality requirements." },
+  { title:"Age of Rivals: Conquest", client:"Mattel / Oktagon Games", category:"games", role:"Game Producer & Project Manager", image:"Age of Rivals Conquest.png", description:"Managed production workflows and live operations, facilitating sprints, retrospectives, scope, capacity and risk management." },
+  { title:"So Fart Away", client:"Rataiada Games", category:"production", role:"Mentor · Business Developer · Product Owner", image:"So Fart Away.png", description:"Supported the indie team across mentoring, game design, production, business development and product ownership." }
 ];
 
 export const gameProjects = [
