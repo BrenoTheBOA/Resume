@@ -4,26 +4,189 @@ import Header from "../components/Header.astro";
 import { projects } from "../data/projects.js";
 import { experience } from "../data/experience.js";
 ---
+
 <Layout>
 <div class="wrap">
 <Header />
-<section class="hero"><div><div class="kicker">Project Management · Game Production · Game Design</div><h1><span>Breno</span><span class="outline">Almeida.</span></h1><p class="intro">Project Manager and Game Producer connecting business, product, creative and technical teams to turn ideas into organized production and successful delivery.</p></div><aside class="side"><div class="availability"><i></i> São Paulo · Brazil</div><strong>10+ YEARS</strong><p>Experience across games, digital products, events, consulting and creative operations.</p><strong>NOW</strong><p>Focused on Project Management, PMO, Product Delivery and Game Production.</p></aside></section>
-<section class="section" id="about"><div class="section-label">01 / Positioning</div><p class="statement">I bridge <em>creative vision</em> and <em>structured delivery</em> — from strategy and planning to production, teams, stakeholders and release.</p></section>
-<section class="section" id="work"><div class="work-head"><div><div class="section-label">02 / Selected Work</div><h2>Projects that shipped.</h2></div><div class="filters"><button class="active" data-filter="all">ALL</button><button data-filter="games">GAMES</button><button data-filter="production">PRODUCTION</button></div></div><div class="work-grid">
-{projects.map((p,i)=><article class:list={["work-card",i%2===0?"wide":"narrow"]} data-type={p.category}><div><span class="tag">{p.client} · {p.role}</span></div><div class="card-bottom"><div><h3>{p.title}</h3><p>{p.description}</p></div><span class="arrow">↗</span></div></article>)}
-</div></section>
-<section class="section" id="career"><div class="section-label">03 / Career Timeline</div><div class="timeline">
-{experience.map(e=><article class="event"><div class="date">{e.period}</div><div class="event-body">{e.logo && <div class="event-logo"><img src={`/Resume/assets/experience/${encodeURIComponent(e.logo)}`} alt="" /></div>}<div class="event-copy"><h3>{e.company} · {e.role}</h3><p>{e.summary}</p></div></div></article>)}
-</div></section>
-<section class="section"><div class="section-label">04 / At a glance</div><div class="stats"><div class="stat"><b>10+</b><span>Years of experience</span></div><div class="stat"><b>100+</b><span>Projects led</span></div><div class="stat"><b>80+</b><span>Games in the archive</span></div></div></section>
-<section class="section"><div class="section-label">05 / Selected Clients & Partners</div><div class="client-wall">{["Ubisoft","Paradox Interactive","Mattel","GameMill","Roblox","Sony","Tencent","ByteDance","Nickelodeon","SEBRAE"].map(client=><span>{client}</span>)}</div></section>
-<section class="section" id="contact"><div class="contact"><div><div class="section-label">06 / Contact</div><h2>Let's build<br/>something.</h2></div><div><p>For opportunities in Project Management, PMO, Product, Game Production and multidisciplinary creative projects.</p><div class="links"><a href="mailto:brenodeoliveiraalmeida@gmail.com">Email ↗</a><a href="https://www.linkedin.com/in/brenotheboa/">LinkedIn ↗</a><a href="/Resume/games.html">Games Archive ↗</a></div></div></div></section>
+
+<section class="hero">
+  <div>
+    <div class="kicker">Project Management · Game Production · Game Design</div>
+    <h1><span>Breno</span><span class="outline">Almeida.</span></h1>
+    <p class="intro">Project Manager and Game Producer connecting business, product, creative and technical teams to turn ideas into organized production and successful delivery.</p>
+  </div>
+  <aside class="side">
+    <div class="availability"><i></i> São Paulo · Brazil</div>
+    <strong>10+ YEARS</strong>
+    <p>Experience across games, digital products, events, consulting and creative operations.</p>
+    <strong>NOW</strong>
+    <p>Focused on Project Management, PMO, Product Delivery and Game Production.</p>
+  </aside>
+</section>
+
+<section class="career-map" aria-labelledby="map-title">
+  <div class="section-label">01 / CAREER MAP</div>
+  <div class="map-intro"><h2 id="map-title">Explore my career.</h2><p>Choose a path. Each node expands into the work behind it.</p></div>
+  <div class="bubble-field">
+    <button class="bubble bubble-projects is-active" data-panel="projects">PROJECTS</button>
+    <button class="bubble bubble-experience" data-panel="experience">EXPERIENCE</button>
+    <button class="bubble bubble-games" data-panel="games">GAMES</button>
+    <button class="bubble bubble-capabilities" data-panel="capabilities">CAPABILITIES</button>
+    <button class="bubble bubble-about" data-panel="about">ABOUT</button>
+    <button class="bubble bubble-contact" data-panel="contact">CONTACT</button>
+    <div class="bubble-core">BOA</div>
+  </div>
+  <div class="map-panels">
+    <article class="map-panel is-open" data-content="projects"><div><span>SELECTED WORK</span><h3>Projects that shipped.</h3></div><a href="#work">Explore projects ↗</a></article>
+    <article class="map-panel" data-content="experience"><div><span>CAREER</span><h3>10+ years across production, PMO and games.</h3></div><a href="#career">View career timeline ↗</a></article>
+    <article class="map-panel" data-content="games"><div><span>ARCHIVE</span><h3>80+ games and interactive projects.</h3></div><a href="/Resume/games/">Open games archive ↗</a></article>
+    <article class="map-panel" data-content="capabilities"><div><span>CAPABILITIES</span><h3>Project Management · Game Production · Game Design</h3></div><p>Agile · Scrum · Kanban · PMO · Product Delivery · Stakeholder Management · Risk Management</p></article>
+    <article class="map-panel" data-content="about"><div><span>ABOUT</span><h3>Creative thinking, structured delivery.</h3></div><p>Based in São Paulo, Brazil. Working across games, digital products, events and creative operations.</p></article>
+    <article class="map-panel" data-content="contact"><div><span>CONTACT</span><h3>Let's build something.</h3></div><a href="#contact">Get in touch ↗</a></article>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="section-label">01 / Positioning</div>
+  <p class="statement">I bridge <em>creative vision</em> and <em>structured delivery</em> — from strategy and planning to production, teams, stakeholders and release.</p>
+</section>
+
+<section class="section" id="work">
+  <div class="work-head">
+    <div><div class="section-label">02 / Selected Work</div><h2>Projects that shipped.</h2></div>
+    <div class="filters" aria-label="Project filters">
+      <button class="active" data-filter="all">ALL</button>
+      <button data-filter="games">GAMES</button>
+      <button data-filter="production">PRODUCTION</button>
+    </div>
+  </div>
+
+  <div class="work-grid">
+    {projects.map((p,i)=>
+      <article class:list={["work-card",i===0?"hero-card":"",i%2===0?"wide":"narrow"]} data-type={p.category}>
+        <div class="project-media">
+          <img src={`${import.meta.env.BASE_URL}assets/projects/${encodeURIComponent(p.image)}`} alt={p.title} loading={i>1?"lazy":"eager"} />
+          <span class="media-shade"></span>
+          <span class="tag">{p.client} · {p.role}</span>
+        </div>
+        <div class="card-bottom">
+          <div><h3>{p.title}</h3><p>{p.description}</p></div>
+          <span class="arrow">↗</span>
+        </div>
+      </article>
+    )}
+  </div>
+</section>
+
+<section class="section" id="career">
+  <div class="section-label">03 / Career Timeline</div>
+  <div class="timeline">
+    {experience.map(e=>
+      <article class="event">
+        <div class="date">{e.period}</div>
+        <div class:list={["event-body", !e.logo && "no-logo"]}>
+          {e.logo && <div class="event-logo"><img src={`${import.meta.env.BASE_URL}assets/${e.logoFolder || "experience"}/${encodeURIComponent(e.logo)}`} alt="" loading="lazy" /></div>}
+          <div class="event-copy"><h3>{e.company} · {e.role}</h3><p>{e.summary}</p></div>
+        </div>
+      </article>
+    )}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">04 / At a glance</div>
+  <div class="stats">
+    <div class="stat"><b>10+</b><span>Years of experience</span></div>
+    <div class="stat"><b>100+</b><span>Projects led</span></div>
+    <div class="stat"><b>80+</b><span>Games in the archive</span></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">05 / Selected Clients & Partners</div>
+  <div class="client-wall">
+    {[
+      "Ubisoft.png","Paradox.png","Mattel.png","GameMill.png","Roblox.png",
+      "Sony.png","Tencent.png","ByteDance.png","Nickelodeon.png","Sebrae.png"
+    ].map((logo)=><div class="client-logo"><img src={`${import.meta.env.BASE_URL}assets/clients/${encodeURIComponent(logo)}`} alt={logo.replace(".png","")} loading="lazy" /></div>)}
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="contact">
+    <div><div class="section-label">06 / Contact</div><h2>Let's build<br/>something.</h2></div>
+    <div>
+      <p>For opportunities in Project Management, PMO, Product, Game Production and multidisciplinary creative projects.</p>
+      <div class="links"><a href="mailto:brenodeoliveiraalmeida@gmail.com">Email ↗</a><a href="https://www.linkedin.com/in/brenotheboa/">LinkedIn ↗</a><a href={`${import.meta.env.BASE_URL}games`}>Games Archive ↗</a></div>
+    </div>
+  </div>
+</section>
 </div>
+
 <style>
-:global(*){box-sizing:border-box}:global(body){margin:0;background:#f7f7f4;color:#111214;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}:global(a){color:inherit;text-decoration:none}
-.wrap{max-width:1160px;margin:auto;padding:0 28px}.nav{height:76px;border-bottom:1px solid #dedfdd;display:flex;align-items:center;justify-content:space-between}.logo{font-weight:900;font-size:20px;letter-spacing:-.07em}.nav nav{display:flex;gap:10px}.nav nav a{font-size:12px;color:#74777d;padding:10px}.hero{padding:85px 0 95px;min-height:620px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:80px;align-items:end}.kicker,.section-label,.tag{font-size:11px;text-transform:uppercase;letter-spacing:.17em;color:#74777d}.kicker{margin-bottom:22px}.hero h1{font-size:clamp(58px,9vw,122px);line-height:.82;letter-spacing:-.09em;margin:0 0 35px;font-weight:850}.hero h1 span{display:block}.outline{color:transparent;-webkit-text-stroke:1.5px #111214}.intro{font-size:20px;line-height:1.5;max-width:680px;color:#45484e}.side{border-left:1px solid #dedfdd;padding-left:28px;font-size:13px;line-height:1.7;color:#74777d}.side strong{display:block;color:#111214;font-size:13px;margin-top:20px}.availability{display:flex;align-items:center;gap:8px;margin-bottom:28px}.availability i{width:7px;height:7px;border-radius:50%;background:#111;box-shadow:0 0 0 5px #e3e3df}.section{border-top:1px solid #dedfdd;padding:76px 0}.statement{font-size:clamp(30px,4.5vw,58px);line-height:1.02;letter-spacing:-.065em;max-width:1000px;margin:30px 0 0}.statement em{font-style:normal;color:#74777d}.work-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:26px}.work-head h2{font-size:32px;letter-spacing:-.05em;margin:10px 0 0}.filters{display:flex;gap:5px}.filters button{border:1px solid #dedfdd;background:transparent;padding:8px 11px;font-size:11px;cursor:pointer;color:#74777d}.filters button.active{background:#111214;color:#fff;border-color:#111214}.work-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.work-card{background:#eeefeb;min-height:300px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:transform .35s,background .35s}.work-card:hover{transform:translateY(-6px);background:#e7e8e3}.wide{grid-column:span 7}.narrow{grid-column:span 5}.card-bottom{display:flex;justify-content:space-between;align-items:end}.work-card h3{font-size:30px;letter-spacing:-.06em;margin:8px 0}.work-card p{font-size:13px;line-height:1.5;color:#666970;max-width:390px;margin:0}.arrow{font-size:21px}.timeline{position:relative;margin-top:30px}.timeline:before{content:"";position:absolute;left:108px;top:0;bottom:0;width:1px;background:#dedfdd}.event{display:grid;grid-template-columns:180px 1fr;min-height:100px;position:relative}.date{font-size:11px;color:#74777d;padding-top:4px}.event-body{padding:0 0 38px 40px;display:grid;grid-template-columns:64px 1fr;gap:18px}.event-logo{width:64px;height:64px;border:1px solid #dedfdd;background:#fff;display:grid;place-items:center;padding:8px}.event-logo img{width:100%;height:100%;object-fit:contain}.event-copy{}.event-body:before{content:"";position:absolute;left:103px;top:2px;width:10px;height:10px;background:#f7f7f4;border:2px solid #111214;border-radius:50%}.event h3{margin:0 0 4px;font-size:18px;letter-spacing:-.025em}.event p{margin:0;color:#74777d;font-size:13px;line-height:1.5}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#dedfdd;border:1px solid #dedfdd;margin-top:30px}.stat{background:#f7f7f4;padding:28px}.stat b{display:block;font-size:42px;letter-spacing:-.07em}.stat span{font-size:11px;color:#74777d;text-transform:uppercase;letter-spacing:.1em}.contact{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:end}.contact h2{font-size:clamp(42px,6vw,75px);line-height:.9;letter-spacing:-.075em;margin:30px 0 0}.contact p{color:#74777d;line-height:1.6;font-size:14px}.links{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}.links a{border:1px solid #111214;padding:11px 14px;font-size:12px}.links a:hover{background:#111214;color:#fff}.client-wall{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid #dedfdd;margin-top:30px}.client-wall span{padding:24px 18px;border-right:1px solid #dedfdd;border-bottom:1px solid #dedfdd;font-size:13px;font-weight:600;letter-spacing:-.02em}.client-wall span:nth-child(5n){border-right:0}@media(max-width:700px){.nav nav{display:none}.hero{grid-template-columns:1fr;gap:40px;padding:65px 0}.side{border-left:0;border-top:1px solid #dedfdd;padding:22px 0 0}.work-grid{grid-template-columns:1fr}.wide,.narrow{grid-column:auto}.event{grid-template-columns:100px 1fr}.timeline:before{left:100px}.event-body{padding-left:25px;grid-template-columns:48px 1fr}.event-logo{width:48px;height:48px}.event-body:before{left:95px}.stats{grid-template-columns:1fr}.client-wall{grid-template-columns:repeat(2,1fr)}.client-wall span:nth-child(5n){border-right:1px solid #dedfdd}.client-wall span:nth-child(2n){border-right:0}.contact{grid-template-columns:1fr;gap:35px}}</style>
+:global(*){box-sizing:border-box}
+:global(body){margin:0;background:#101412;color:#edf5ef;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background-image:radial-gradient(circle at 78% 8%,rgba(119,255,163,.08),transparent 28%),radial-gradient(circle at 12% 55%,rgba(77,177,112,.055),transparent 32%);background-attachment:fixed}
+:global(a){color:inherit;text-decoration:none}
+.wrap{max-width:1160px;margin:auto;padding:0 28px}
+.nav{height:76px;border-bottom:1px solid rgba(166,236,188,.24);display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{font-weight:900;font-size:20px;letter-spacing:-.07em;flex:none}
+.nav nav{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}.nav nav::-webkit-scrollbar{display:none}
+.nav nav a{font-size:12px;color:#9ba8a0;padding:10px 8px;white-space:nowrap;scroll-snap-align:start}.nav nav a:hover{color:#b8ffd0}
+.hero{padding:85px 0 95px;min-height:620px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:80px;align-items:end}
+.kicker,.section-label,.tag{font-size:11px;text-transform:uppercase;letter-spacing:.17em;color:#88a494}
+.kicker{margin-bottom:22px}
+.hero h1{font-size:clamp(64px,9vw,122px);line-height:.82;letter-spacing:-.09em;margin:0 0 35px;font-weight:850}.hero h1 span{display:block}.outline{color:transparent;-webkit-text-stroke:1.5px #b7f5c9;text-shadow:0 0 22px rgba(129,240,164,.12)}
+.intro{font-size:20px;line-height:1.5;max-width:680px;color:#b8c5bd}
+.side{border-left:1px solid rgba(166,236,188,.24);padding-left:28px;font-size:13px;line-height:1.7;color:#9eaaa3}.side strong{display:block;color:#effff3;font-size:13px;margin-top:20px}.availability{display:flex;align-items:center;gap:8px;margin-bottom:28px}.availability i{width:7px;height:7px;border-radius:50%;background:#a9f6be;box-shadow:0 0 0 5px rgba(169,246,190,.10),0 0 18px rgba(169,246,190,.45)}
+.section{border-top:1px solid rgba(166,236,188,.16);padding:76px 0}
+.statement{font-size:clamp(30px,4.5vw,58px);line-height:1.02;letter-spacing:-.065em;max-width:1000px;margin:30px 0 0}.statement em{font-style:normal;color:#82938a}
+.work-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:26px;gap:20px}.work-head h2{font-size:32px;letter-spacing:-.05em;margin:10px 0 0}
+.filters{display:flex;gap:5px;flex:none}.filters button{border:1px solid rgba(166,236,188,.25);background:rgba(255,255,255,.015);padding:9px 11px;font-size:11px;cursor:pointer;color:#9eaaa3}.filters button.active{background:#b6f6c9;color:#0d1710;border-color:#b6f6c9}
+.work-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.work-card{background:linear-gradient(145deg,#202622,#171c19);border:1px solid rgba(166,236,188,.14);min-height:410px;padding:0;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;cursor:pointer;transition:transform .35s,background .35s;content-visibility:auto}
+.work-card:hover{transform:translateY(-6px);background:linear-gradient(145deg,#26312a,#19211c);border-color:rgba(166,236,188,.38);box-shadow:0 18px 45px rgba(0,0,0,.24)}
+.wide{grid-column:span 7}.narrow{grid-column:span 5}.hero-card{min-height:470px}
+.project-media{height:245px;position:relative;overflow:hidden;background:#161b18}.hero-card .project-media{height:285px}
+.project-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.2,.7,.2,1)}.work-card:hover .project-media img{transform:scale(1.045)}
+.media-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42))}
+.project-media .tag{position:absolute;left:22px;bottom:18px;color:#fff;z-index:1}
+.card-bottom{display:flex;justify-content:space-between;align-items:end;gap:20px;padding:24px}.work-card h3{font-size:28px;letter-spacing:-.06em;margin:0 0 8px;color:#effff3}.work-card p{font-size:13px;line-height:1.5;color:#aab7af;max-width:430px;margin:0}.arrow{font-size:21px;flex:none}
+.timeline{position:relative;margin-top:30px}.timeline:before{content:"";position:absolute;left:108px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,rgba(169,246,190,.35),rgba(169,246,190,.08))}
+.event{display:grid;grid-template-columns:180px 1fr;min-height:100px;position:relative}.date{font-size:11px;color:#74777d;padding-top:4px}.event-body{padding:0 0 38px 40px;display:grid;grid-template-columns:64px minmax(0,1fr);gap:18px;min-width:0}.event-body.no-logo{grid-template-columns:minmax(0,1fr)}.event-copy{min-width:0}.event-logo{width:64px;height:64px;border:1px solid rgba(166,236,188,.22);background:#1a211d;display:grid;place-items:center;padding:8px;box-shadow:inset 0 0 0 1px rgba(166,236,188,.04)}.event-logo img{width:100%;height:100%;object-fit:contain}.event-body:before{content:"";position:absolute;left:103px;top:2px;width:10px;height:10px;background:#101412;border:2px solid #a9f6be;border-radius:50%;box-shadow:0 0 12px rgba(169,246,190,.22)}.event h3{margin:0 0 5px;font-size:18px;letter-spacing:-.025em;color:#effff3}.event p{margin:0;color:#9eaaa3;font-size:13px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(166,236,188,.18);border:1px solid rgba(166,236,188,.18);margin-top:30px}.stat{background:#151b18;padding:28px}.stat b{display:block;font-size:42px;letter-spacing:-.07em;color:#dfffe8}.stat span{font-size:11px;color:#88a494;text-transform:uppercase;letter-spacing:.1em}
+.client-wall{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(166,236,188,.18);border:1px solid rgba(166,236,188,.18);margin-top:30px}.client-logo{height:96px;background:#151b18;display:grid;place-items:center;padding:20px;transition:background .25s}.client-logo:hover{background:#1b241e}.client-logo img{max-width:100%;max-height:48px;object-fit:contain;filter:grayscale(1) brightness(1.55);opacity:.72;transition:filter .25s,opacity .25s}.client-logo:hover img{filter:grayscale(0) brightness(1.12);opacity:1}
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:end}.contact h2{font-size:clamp(42px,6vw,75px);line-height:.9;letter-spacing:-.075em;margin:30px 0 0;color:#effff3}.contact p{color:#a7b4ac;line-height:1.6;font-size:14px}.links{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}.links a{border:1px solid rgba(166,236,188,.38);padding:11px 14px;font-size:12px;background:rgba(166,236,188,.025)}.links a:hover{background:#b6f6c9;color:#0d1710}
+@media(max-width:700px){
+  .wrap{padding:0 18px}.nav{height:64px;align-items:center}.nav nav{max-width:calc(100vw - 72px);padding-bottom:2px}.nav nav a{font-size:11px;padding:9px 7px}
+  .hero{grid-template-columns:1fr;gap:38px;padding:68px 0 76px;min-height:0}.kicker{line-height:1.5;margin-bottom:18px}.hero h1{font-size:clamp(62px,18vw,92px);line-height:.86;margin-bottom:30px}.intro{font-size:18px;line-height:1.58;max-width:34rem}.side{border-left:0;border-top:1px solid rgba(166,236,188,.24);padding:26px 0 0}
+  .section{padding:62px 0}.section-label{font-size:11px}.statement{font-size:37px;line-height:1.05;margin-top:24px}
+  .work-head{display:block}.work-head h2{font-size:30px;margin-bottom:20px}.filters{overflow-x:auto;padding-bottom:2px}.filters button{min-height:40px}
+  .work-grid{grid-template-columns:1fr;gap:12px}.wide,.narrow{grid-column:auto}.work-card,.hero-card{min-height:0}.project-media,.hero-card .project-media{height:218px}.card-bottom{padding:22px}.work-card h3{font-size:28px;line-height:1.08}.work-card p{font-size:14.5px;line-height:1.58;color:#aab7af}.arrow{font-size:24px}
+  .timeline{margin-top:28px}.timeline:before{left:8px}.event{grid-template-columns:1fr;min-height:0;padding-left:26px}.event-body{padding:0 0 32px 0;grid-template-columns:54px minmax(0,1fr);gap:15px;min-width:0}.event-body.no-logo{grid-template-columns:1fr}.event-logo{width:54px;height:54px}.event-body:before{left:3px;top:2px;width:9px;height:9px}.event h3{font-size:18px;line-height:1.12}.event p{font-size:14.5px;line-height:1.55}
+  .stats{grid-template-columns:1fr}.stat{padding:24px}.stat b{font-size:46px}
+  .client-wall{grid-template-columns:repeat(2,1fr);overflow:hidden}.client-logo{height:92px;padding:18px}.client-logo img{max-height:46px}
+  .contact{grid-template-columns:1fr;gap:35px}.contact h2{font-size:58px}
+}
+@media(prefers-reduced-motion:reduce){.work-card,.project-media img,.client-logo img{transition:none}}
+
+.career-map{padding:92px 0 36px;border-top:1px solid rgba(166,236,188,.16)}
+.map-intro{display:flex;justify-content:space-between;align-items:end;gap:30px;margin:18px 0 34px}.map-intro h2{font-size:clamp(38px,5vw,72px);margin:0;letter-spacing:-.05em}.map-intro p{max-width:320px;color:#9ba8a0;margin:0}
+.bubble-field{position:relative;min-height:440px;border:1px solid rgba(166,236,188,.18);border-radius:32px;overflow:hidden;background:radial-gradient(circle at center,rgba(122,255,160,.10),transparent 28%),linear-gradient(135deg,#151b18,#0c100f)}
+.bubble{position:absolute;z-index:2;border:1px solid rgba(166,236,188,.45);background:rgba(20,28,24,.78);color:#e9f4ed;border-radius:999px;padding:20px 28px;letter-spacing:.12em;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:.35s ease;box-shadow:0 15px 45px rgba(0,0,0,.2);animation:careerFloat 6s ease-in-out infinite}.bubble:hover,.bubble:focus-visible,.bubble.is-active{transform:scale(1.08);border-color:#a6ecbc;box-shadow:0 0 30px rgba(166,236,188,.16)}
+.bubble-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:105px;height:105px;border-radius:50%;display:grid;place-items:center;border:1px solid #a6ecbc;background:#111714;color:#a6ecbc;letter-spacing:.18em;font-weight:700;box-shadow:0 0 50px rgba(166,236,188,.08)}
+.bubble-projects{left:10%;top:18%;animation-delay:-1s}.bubble-experience{right:9%;top:20%;animation-delay:-3s}.bubble-games{left:7%;bottom:16%;animation-delay:-4s}.bubble-capabilities{right:7%;bottom:17%;animation-delay:-2s}.bubble-about{left:39%;top:8%;animation-delay:-5s}.bubble-contact{right:34%;bottom:7%;animation-delay:-1.5s}
+@keyframes careerFloat{50%{translate:0 -8px}}
+.map-panels{margin-top:16px}.map-panel{display:none;align-items:end;justify-content:space-between;gap:25px;padding:26px;border:1px solid rgba(166,236,188,.18);background:#151b18;border-radius:18px}.map-panel.is-open{display:flex}.map-panel span{font-size:10px;letter-spacing:.16em;color:#a6ecbc}.map-panel h3{font-size:clamp(22px,3vw,38px);margin:8px 0 0;letter-spacing:-.03em}.map-panel p{max-width:560px;color:#aab7af;margin:0}.map-panel a{color:#e9f4ed;text-decoration:none;white-space:nowrap}
+@media(max-width:700px){.career-map{padding:66px 0 26px}.map-intro{display:block;margin-bottom:24px}.map-intro h2{font-size:42px}.map-intro p{margin-top:10px}.bubble-field{min-height:370px;border-radius:24px}.bubble{padding:15px 18px;font-size:10px}.bubble-core{width:80px;height:80px;font-size:11px}.bubble-projects{left:6%;top:18%}.bubble-experience{right:5%;top:26%}.bubble-games{left:7%;bottom:18%}.bubble-capabilities{right:4%;bottom:25%}.bubble-about{left:34%;top:7%}.bubble-contact{right:29%;bottom:7%}.map-panel{flex-direction:column;align-items:flex-start;padding:20px}.map-panel h3{font-size:25px}.map-panel a{white-space:normal}}
+@media(prefers-reduced-motion:reduce){.bubble{animation:none;transition:none}}
+</style>
+
 <script>
 const filters=document.querySelectorAll("[data-filter]"),cards=document.querySelectorAll(".work-card");
 filters.forEach(f=>f.addEventListener("click",()=>{filters.forEach(x=>x.classList.remove("active"));f.classList.add("active");const t=f.dataset.filter;cards.forEach(c=>c.style.display=t==="all"||c.dataset.type===t?"flex":"none")}));
+
+const careerBubbles=document.querySelectorAll(".career-map .bubble");
+const careerPanels=document.querySelectorAll(".career-map .map-panel");
+careerBubbles.forEach((bubble)=>bubble.addEventListener("click",()=>{const key=bubble.dataset.panel;careerBubbles.forEach(x=>x.classList.toggle("is-active",x===bubble));careerPanels.forEach(p=>p.classList.toggle("is-open",p.dataset.content===key));const panel=document.querySelector('[data-content="'+key+'"]');if(window.innerWidth<701&&panel)panel.scrollIntoView({behavior:"smooth",block:"nearest"});}));
 </script>
 </Layout>
