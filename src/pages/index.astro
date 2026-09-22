@@ -142,7 +142,7 @@ const artwork = {
 (() => {
   const orbit=document.getElementById("orbit"), mini=document.getElementById("mini"), name=document.getElementById("name"), home=document.getElementById("home");
   const sections=[...document.querySelectorAll(".section")], bubbles=[...document.querySelectorAll(".bubble")];
-  let selectedBubble=null, openingSection=false;
+  let selectedBubble=null, openingSection=false, returningHome=false;
   let carouselAngle=0, carouselStartAngle=0, activeIndex=0;
   let gesture=null;
 
@@ -224,6 +224,7 @@ const artwork = {
   }
 
   function restoreHome(){
+    returningHome=false;
     clearSelectedBubble();
     sections.forEach(section=>{
       section.classList.add("collapsed");
@@ -241,8 +242,11 @@ const artwork = {
   }
 
   function returnToHomeManually(){
-    if(openingSection)return;
+    if(openingSection || returningHome)return;
     const chosen=selectedBubble;
+    if(!chosen){restoreHome();return}
+    returningHome=true;
+    selectedBubble=null;
     sections.forEach(section=>{
       section.classList.add("collapsed");
       section.classList.remove("has-morph-title");
@@ -252,8 +256,6 @@ const artwork = {
     orbit.classList.add("returning-home");
     orbit.style.opacity="1";
     mini.classList.remove("visible");
-
-    if(!chosen){restoreHome();return}
 
     const wrapper=chosen.parentElement;
     const sourceRect=wrapper.getBoundingClientRect();
@@ -282,6 +284,7 @@ const artwork = {
       orbit.classList.remove("returning-home","scrolled","transitioning");
       orbit.style.opacity="1";
       selectedBubble=null;
+      returningHome=false;
       carouselAngle=0;
       activeIndex=0;
       applyCarousel(false);
@@ -403,7 +406,7 @@ const artwork = {
   window.addEventListener("scroll",()=>{
     const y=window.scrollY;
     if(y>home.offsetHeight*.3)mini.classList.add("visible");else mini.classList.remove("visible");
-    if(selectedBubble&&!openingSection&&y<=4)returnToHomeManually();
+    if(selectedBubble&&!openingSection&&!returningHome&&y<=4)returnToHomeManually();
   },{passive:true});
 
   window.addEventListener("resize",()=>applyCarousel(false));
