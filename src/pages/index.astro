@@ -174,23 +174,27 @@ const artwork = {
     collapse();
     selected=b;
 
-    // 1. Open only the clicked page.
+    // Reveal only the requested page.
     sections.forEach(s=>s.classList.toggle("collapsed",s!==target));
     orbit.classList.add("scrolled","transitioning");
 
-    // 2. Capture the page position BEFORE moving the bubble.
-    // This is the key: the browser follows the selected section itself,
-    // not the bubble after it has been re-parented.
-    const targetTop=target.offsetTop;
+    // Always navigate to the first pixel AFTER the full-screen Home.
+    // Do not use offsetTop/scrollIntoView here: collapsed sibling sections
+    // can change the target's offset parent and make it resolve to 0.
+    const navigate=()=>{
+      const destination=Math.ceil(home.getBoundingClientRect().height);
+      window.scrollTo({left:0,top:destination,behavior:"smooth"});
+      document.documentElement.scrollTop=destination;
+      document.body.scrollTop=destination;
+    };
 
-    // 3. Start the automatic navigation immediately.
+    // Let the browser commit the newly-visible section before navigating.
     requestAnimationFrame(()=>{
-      window.scrollTo({top:targetTop,behavior:"smooth"});
-      // Fallback for browsers that ignore smooth scrolling during pointer events.
-      setTimeout(()=>window.scrollTo({top:targetTop,behavior:"smooth"}),120);
+      requestAnimationFrame(navigate);
     });
+    setTimeout(navigate,180);
 
-    // 4. Move the clicked bubble into that page's title.
+    // Move the clicked bubble into the selected page title.
     const w=b.parentElement;
     const source=w.getBoundingClientRect();
     const head=target.querySelector(".section-head");
