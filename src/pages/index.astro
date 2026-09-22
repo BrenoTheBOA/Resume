@@ -140,7 +140,14 @@ const artwork = {
     sections.forEach(s=>s.classList.add("collapsed"));
     orbit.classList.remove("scrolled");
     mini.classList.remove("visible");
-    if(selected){selected.parentElement.classList.remove("selected-bubble","returning");selected=null}
+    if(selected){
+      const w=selected.parentElement;
+      orbit.appendChild(w);
+      w.classList.remove("selected-bubble","returning","dragging");
+      w.style.removeProperty("--from-x");w.style.removeProperty("--from-y");
+      selected.style.removeProperty("--dx");selected.style.removeProperty("--dy");
+      selected=null;
+    }
     name.classList.add("expanded");
     window.scrollTo({top:0,behavior:"smooth"});
   }
