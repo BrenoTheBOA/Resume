@@ -1,2 +1,8 @@
 import { defineConfig } from "astro/config";
-export default defineConfig({ site: "https://brenotheboa.github.io", base: "/Resume" });
+
+const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
+
+export default defineConfig({
+  site: isGitHubPages ? "https://brenotheboa.github.io" : undefined,
+  base: isGitHubPages ? "/Resume" : "/"
+});
