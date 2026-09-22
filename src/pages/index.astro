@@ -169,25 +169,42 @@ const artwork = {
     if(!b||!target)return;
     if(selected&&selected!==b)clearSelected();
     opening=true;collapse();selected=b;
-    const w=b.parentElement, source=w.getBoundingClientRect(), head=target.querySelector(".section-head"), title=head.querySelector("h2"), slot=head.querySelector(":scope > div:nth-child(2)");
+
+    // Capture the bubble's position while it is still in the Home orbit.
+    const w=b.parentElement, source=w.getBoundingClientRect();
+    const head=target.querySelector(".section-head"), title=head.querySelector("h2"), slot=head.querySelector(":scope > div:nth-child(2)");
+
+    // Reveal only the requested page and move the clicked bubble into its title slot.
     sections.forEach(s=>s.classList.toggle("collapsed",s!==target));
-    orbit.classList.add("scrolled","transitioning");title.style.display="none";
+    orbit.classList.add("scrolled","transitioning");
+    title.style.display="none";
     slot.insertBefore(w,title);
+
     w.classList.add("title-bubble","arriving");
     const dest=w.getBoundingClientRect();
     w.style.setProperty("--from-x",(source.left-dest.left+(source.width-dest.width)/2)+"px");
     w.style.setProperty("--from-y",(source.top-dest.top+(source.height-dest.height)/2)+"px");
-    requestAnimationFrame(()=>w.classList.add("arriving"));
-    // Move the viewport below the full-screen home automatically.
-    // Use the home section's actual height rather than scrollIntoView, because the
-    // selected bubble is temporarily re-parented into the target section.
-    const goToSection = () => {
-      const top = home.getBoundingClientRect().height;
-      window.scrollTo({top, behavior:"smooth"});
-    };
-    requestAnimationFrame(goToSection);
-    setTimeout(goToSection, 80);
-    setTimeout(()=>{w.classList.remove("arriving");w.classList.add("landed");w.style.removeProperty("--from-x");w.style.removeProperty("--from-y");orbit.classList.remove("transitioning");opening=false},1420);
+
+    requestAnimationFrame(()=>{
+      w.classList.add("arriving");
+
+      // Follow the clicked bubble to the page it opened.
+      // Calculate the target's real document position AFTER its content is visible,
+      // then scroll there. This avoids scrollIntoView following the re-parented bubble.
+      requestAnimationFrame(()=>{
+        const targetTop=target.getBoundingClientRect().top+window.scrollY;
+        window.scrollTo({top:Math.max(0,targetTop),behavior:"smooth"});
+      });
+    });
+
+    setTimeout(()=>{
+      w.classList.remove("arriving");
+      w.classList.add("landed");
+      w.style.removeProperty("--from-x");
+      w.style.removeProperty("--from-y");
+      orbit.classList.remove("transitioning");
+      opening=false;
+    },1420);
   }
 
   bubbles.forEach(b=>{
