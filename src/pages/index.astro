@@ -165,61 +165,70 @@ const artwork = {
   }
 
   function openSection(id){
-    const b=bubbles.find(x=>x.dataset.section===id);
+    const chosen=bubbles.find(b=>b.dataset.section===id);
     const target=document.getElementById("section-"+id);
-    if(!b||!target)return;
+    if(!chosen||!target)return;
 
-    if(selected&&selected!==b)clearSelected();
+    if(selected&&selected!==chosen)clearSelected();
+
     opening=true;
     collapse();
-    selected=b;
+    selected=chosen;
 
-    // Reveal only the requested page.
-    sections.forEach(s=>s.classList.toggle("collapsed",s!==target));
-    orbit.classList.add("scrolled","transitioning");
-
-    // Always navigate to the first pixel AFTER the full-screen Home.
-    // Do not use offsetTop/scrollIntoView here: collapsed sibling sections
-    // can change the target's offset parent and make it resolve to 0.
-    const navigate=()=>{
-      const destination=Math.ceil(home.getBoundingClientRect().height);
-      window.scrollTo({left:0,top:destination,behavior:"smooth"});
-      document.documentElement.scrollTop=destination;
-      document.body.scrollTop=destination;
-    };
-
-    // Let the browser commit the newly-visible section before navigating.
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(navigate);
-    });
-    setTimeout(navigate,180);
-
-    // Move the clicked bubble into the selected page title.
-    const w=b.parentElement;
-    const source=w.getBoundingClientRect();
+    const wrapper=chosen.parentElement;
+    const sourceRect=wrapper.getBoundingClientRect();
     const head=target.querySelector(".section-head");
     const title=head?.querySelector("h2");
-    const slot=head?.querySelector(":scope > div:nth-child(2)");
-    if(!head||!title||!slot)return;
+    const titleBox=head?.querySelector(":scope > div:nth-child(2)");
+    if(!head||!titleBox||!title)return;
 
+    // This mirrors the original V29 navigation sequence:
+    // reveal the page, keep the opening state alive while the browser scrolls,
+    // then land the clicked bubble in that page's title.
+    sections.forEach(section=>{
+      const active=section===target;
+      section.classList.toggle("collapsed",!active);
+    });
+
+    orbit.classList.add("scrolled","transitioning");
     title.style.display="none";
-    slot.insertBefore(w,title);
-    w.classList.add("title-bubble","arriving");
 
-    const dest=w.getBoundingClientRect();
-    w.style.setProperty("--from-x",(source.left-dest.left+(source.width-dest.width)/2)+"px");
-    w.style.setProperty("--from-y",(source.top-dest.top+(source.height-dest.height)/2)+"px");
+    // First scroll pass: once the target has been laid out.
+    window.setTimeout(()=>{
+      const top=target.getBoundingClientRect().top+window.scrollY;
+      window.scrollTo({left:0,top:Math.max(0,top),behavior:"smooth"});
+    },500);
 
-    requestAnimationFrame(()=>w.classList.add("arriving"));
+    // Move the actual clicked bubble into the target title.
+    titleBox.insertBefore(wrapper,title);
+    wrapper.classList.remove("selected-bubble");
+    wrapper.classList.add("title-bubble","arriving");
 
-    setTimeout(()=>{
-      w.classList.remove("arriving");
-      w.classList.add("landed");
-      w.style.removeProperty("--from-x");
-      w.style.removeProperty("--from-y");
+    const targetRect=wrapper.getBoundingClientRect();
+    const dx=sourceRect.left-targetRect.left+(sourceRect.width-targetRect.width)/2;
+    const dy=sourceRect.top-targetRect.top+(sourceRect.height-targetRect.height)/2;
+    wrapper.style.setProperty("--from-x",dx+"px");
+    wrapper.style.setProperty("--from-y",dy+"px");
+
+    requestAnimationFrame(()=>wrapper.classList.add("arriving"));
+
+    window.setTimeout(()=>{
+      wrapper.classList.remove("arriving");
+      wrapper.classList.add("landed");
+      wrapper.style.removeProperty("--from-x");
+      wrapper.style.removeProperty("--from-y");
       orbit.classList.remove("transitioning");
-      opening=false;
+
+      // Second scroll pass after the bubble has become part of the section.
+      const top=target.getBoundingClientRect().top+window.scrollY;
+      window.scrollTo({left:0,top:Math.max(0,top),behavior:"smooth"});
     },1420);
+
+    // Keep the opening state long enough that the scroll cannot trigger
+    // the "return home" safeguard while the page is still moving.
+    window.setTimeout(()=>{
+      opening=false;
+    },1900);
   }
 
   bubbles.forEach(b=>{
