@@ -143,6 +143,7 @@ const artwork = {
   const orbit=document.getElementById("orbit"), mini=document.getElementById("mini"), name=document.getElementById("name"), home=document.getElementById("home");
   const sections=[...document.querySelectorAll(".section")], bubbles=[...document.querySelectorAll(".bubble")];
   let selectedBubble=null, openingSection=false, returningHome=false;
+  let navigationToken=0;
   let carouselAngle=0, carouselStartAngle=0, activeIndex=0;
   let gesture=null;
 
@@ -210,6 +211,7 @@ const artwork = {
   }
 
   function resetHomeState(){
+    navigationToken++;
     openingSection=false;
     returningHome=false;
 
@@ -257,7 +259,8 @@ const artwork = {
   }
 
   function returnToHomeManually(){
-    if(openingSection)return;
+    // BOA is an emergency navigation control: it must work even while
+    // the section-opening animation is still running.
     resetHomeState();
   }
 
@@ -267,6 +270,7 @@ const artwork = {
     if(!chosen||!target||openingSection)return;
 
     openingSection=true;
+    const token=++navigationToken;
     selectedBubble=chosen;
     const wrapper=chosen.parentElement;
     const sourceRect=wrapper.getBoundingClientRect();
@@ -286,7 +290,10 @@ const artwork = {
     orbit.classList.add("scrolled","transitioning");
     title.style.display="none";
 
-    window.setTimeout(()=>target.scrollIntoView({behavior:"smooth",block:"start"}),120);
+    window.setTimeout(()=>{
+      if(token!==navigationToken)return;
+      target.scrollIntoView({behavior:"smooth",block:"start"});
+    },120);
 
     titleBox.insertBefore(wrapper,title);
     wrapper.classList.remove("selected-bubble");
@@ -301,13 +308,16 @@ const artwork = {
     requestAnimationFrame(()=>wrapper.classList.add("arriving"));
 
     window.setTimeout(()=>{
+      if(token!==navigationToken)return;
       wrapper.classList.remove("arriving");
       wrapper.classList.add("landed");
       wrapper.style.removeProperty("--from-x");
       wrapper.style.removeProperty("--from-y");
       orbit.classList.remove("transitioning");
       target.scrollIntoView({behavior:"smooth",block:"start"});
-      window.setTimeout(()=>{openingSection=false},650);
+      window.setTimeout(()=>{
+        if(token===navigationToken)openingSection=false;
+      },650);
     },1350);
   }
 
