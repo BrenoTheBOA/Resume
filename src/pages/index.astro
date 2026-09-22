@@ -165,7 +165,8 @@ const artwork = {
   }
 
   function openSection(id){
-    const b=bubbles.find(x=>x.dataset.section===id), target=document.getElementById("section-"+id);
+    const b=bubbles.find(x=>x.dataset.section===id);
+    const target=document.getElementById("section-"+id);
     if(!b||!target)return;
 
     if(selected&&selected!==b)clearSelected();
@@ -173,31 +174,34 @@ const artwork = {
     collapse();
     selected=b;
 
-    // Reveal only the requested page first. All other pages stay hidden.
+    // 1. Open only the clicked page.
     sections.forEach(s=>s.classList.toggle("collapsed",s!==target));
     orbit.classList.add("scrolled","transitioning");
 
-    // The selected page is now the first page after the full-screen Home.
-    // Capture its document position BEFORE moving the bubble into the page.
-    const targetTop = home.getBoundingClientRect().height;
+    // 2. Capture the page position BEFORE moving the bubble.
+    // This is the key: the browser follows the selected section itself,
+    // not the bubble after it has been re-parented.
+    const targetTop=target.offsetTop;
 
-    // Go to the requested page immediately. This is deliberately independent
-    // of the bubble's DOM position so every bubble behaves identically.
-    window.scrollTo({top:targetTop, behavior:"smooth"});
+    // 3. Start the automatic navigation immediately.
+    requestAnimationFrame(()=>{
+      window.scrollTo({top:targetTop,behavior:"smooth"});
+      // Fallback for browsers that ignore smooth scrolling during pointer events.
+      setTimeout(()=>window.scrollTo({top:targetTop,behavior:"smooth"}),120);
+    });
 
+    // 4. Move the clicked bubble into that page's title.
     const w=b.parentElement;
     const source=w.getBoundingClientRect();
     const head=target.querySelector(".section-head");
-    const title=head.querySelector("h2");
-    const slot=head.querySelector(":scope > div:nth-child(2)");
+    const title=head?.querySelector("h2");
+    const slot=head?.querySelector(":scope > div:nth-child(2)");
+    if(!head||!title||!slot)return;
 
     title.style.display="none";
     slot.insertBefore(w,title);
-
     w.classList.add("title-bubble","arriving");
 
-    // Animate the clicked bubble from its original Home position to the
-    // title position in the selected page.
     const dest=w.getBoundingClientRect();
     w.style.setProperty("--from-x",(source.left-dest.left+(source.width-dest.width)/2)+"px");
     w.style.setProperty("--from-y",(source.top-dest.top+(source.height-dest.height)/2)+"px");
