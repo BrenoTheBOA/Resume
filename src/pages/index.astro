@@ -209,88 +209,56 @@ const artwork = {
     applyCarousel(true);
   }
 
-  function clearSelectedBubble(){
-    if(!selectedBubble)return;
-    const wrapper=selectedBubble.parentElement;
-    if(wrapper && wrapper.parentElement && !wrapper.parentElement.matches("#orbit")) orbit.appendChild(wrapper);
-    wrapper?.classList.remove("selected-bubble","title-bubble","arriving","returning-title","dragging","morphing","landed","carousel-active");
-    wrapper?.style.removeProperty("--from-x");
-    wrapper?.style.removeProperty("--from-y");
-    selectedBubble.classList.remove("dragging","returning");
-    selectedBubble.style.removeProperty("--dx");
-    selectedBubble.style.removeProperty("--dy");
-    selectedBubble=null;
-    applyCarousel(false);
-  }
-
-  function restoreHome(){
+  function resetHomeState(){
+    openingSection=false;
     returningHome=false;
-    clearSelectedBubble();
+
+    // Always put every bubble back inside the home carousel first.
+    bubbles.forEach(bubble=>{
+      const wrapper=bubble.parentElement;
+      if(wrapper && wrapper.parentElement !== orbit) orbit.appendChild(wrapper);
+
+      wrapper?.classList.remove(
+        "selected-bubble","title-bubble","arriving","returning-title",
+        "dragging","morphing","landed","carousel-active"
+      );
+      wrapper?.style.removeProperty("--from-x");
+      wrapper?.style.removeProperty("--from-y");
+      wrapper?.style.removeProperty("opacity");
+      wrapper?.style.removeProperty("pointer-events");
+      bubble.style.removeProperty("--dx");
+      bubble.style.removeProperty("--dy");
+    });
+
     sections.forEach(section=>{
       section.classList.add("collapsed");
       section.classList.remove("has-morph-title");
       section.querySelector(".section-head")?.classList.remove("has-selected-bubble");
     });
+
+    selectedBubble=null;
+    activeIndex=0;
+    carouselAngle=0;
+
     orbit.classList.remove("scrolled","transitioning","returning-home");
     orbit.style.opacity="1";
     mini.classList.remove("visible");
-    carouselAngle=0;
-    activeIndex=0;
-    applyCarousel(false);
+
     expand();
-    window.scrollTo({top:0,behavior:"smooth"});
+    applyCarousel(false);
+
+    // Reset scroll synchronously. This prevents the scroll listener from
+    // starting another return animation while the home state is being restored.
+    window.scrollTo(0,0);
+  }
+
+  function restoreHome(){
+    resetHomeState();
   }
 
   function returnToHomeManually(){
-    if(openingSection || returningHome)return;
-    const chosen=selectedBubble;
-    if(!chosen){restoreHome();return}
-    returningHome=true;
-    selectedBubble=null;
-    sections.forEach(section=>{
-      section.classList.add("collapsed");
-      section.classList.remove("has-morph-title");
-      section.querySelector(".section-head")?.classList.remove("has-selected-bubble");
-    });
-    orbit.classList.remove("scrolled","transitioning");
-    orbit.classList.add("returning-home");
-    orbit.style.opacity="1";
-    mini.classList.remove("visible");
-
-    const wrapper=chosen.parentElement;
-    const sourceRect=wrapper.getBoundingClientRect();
-    orbit.appendChild(wrapper);
-    applyCarousel(false);
-    const targetRect=wrapper.getBoundingClientRect();
-    const dx=sourceRect.left-targetRect.left+(sourceRect.width-targetRect.width)/2;
-    const dy=sourceRect.top-targetRect.top+(sourceRect.height-targetRect.height)/2;
-
-    wrapper.classList.remove("arriving","landed");
-    wrapper.classList.add("selected-bubble","returning-title");
-    wrapper.style.setProperty("--from-x",dx+"px");
-    wrapper.style.setProperty("--from-y",dy+"px");
-
-    requestAnimationFrame(()=>wrapper.classList.add("returning-title"));
-
-    window.setTimeout(()=>{
-      bubbles.forEach(bubble=>{
-        const w=bubble.parentElement;
-        w.classList.remove("selected-bubble","returning-title","title-bubble","arriving","landed","dragging","morphing");
-        w.style.removeProperty("opacity");
-        w.style.removeProperty("pointer-events");
-        bubble.style.removeProperty("--dx");
-        bubble.style.removeProperty("--dy");
-      });
-      orbit.classList.remove("returning-home","scrolled","transitioning");
-      orbit.style.opacity="1";
-      selectedBubble=null;
-      returningHome=false;
-      carouselAngle=0;
-      activeIndex=0;
-      applyCarousel(false);
-      expand();
-      window.scrollTo({top:0,behavior:"smooth"});
-    },1320);
+    if(openingSection)return;
+    resetHomeState();
   }
 
   function openSection(id){
@@ -406,7 +374,11 @@ const artwork = {
   window.addEventListener("scroll",()=>{
     const y=window.scrollY;
     if(y>home.offsetHeight*.3)mini.classList.add("visible");else mini.classList.remove("visible");
-    if(selectedBubble&&!openingSection&&!returningHome&&y<=4)returnToHomeManually();
+
+    // Reaching the top means the user is returning to Home.
+    if(y<=4 && selectedBubble && !openingSection){
+      resetHomeState();
+    }
   },{passive:true});
 
   window.addEventListener("resize",()=>applyCarousel(false));
