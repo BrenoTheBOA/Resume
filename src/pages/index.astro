@@ -178,7 +178,9 @@ const artwork = {
     w.style.setProperty("--from-x",(source.left-dest.left+(source.width-dest.width)/2)+"px");
     w.style.setProperty("--from-y",(source.top-dest.top+(source.height-dest.height)/2)+"px");
     requestAnimationFrame(()=>w.classList.add("arriving"));
-    setTimeout(()=>{w.classList.remove("arriving");w.classList.add("landed");w.style.removeProperty("--from-x");w.style.removeProperty("--from-y");orbit.classList.remove("transitioning");target.scrollIntoView({behavior:"smooth",block:"start"});opening=false},1420);
+    // Navigate to the selected section immediately. The bubble animation continues while the page scrolls.
+    requestAnimationFrame(()=>target.scrollIntoView({behavior:"smooth",block:"start"}));
+    setTimeout(()=>{w.classList.remove("arriving");w.classList.add("landed");w.style.removeProperty("--from-x");w.style.removeProperty("--from-y");orbit.classList.remove("transitioning");opening=false},1420);
   }
 
   bubbles.forEach(b=>{
