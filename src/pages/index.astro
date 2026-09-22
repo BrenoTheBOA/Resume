@@ -24,6 +24,28 @@ import { experience } from "../data/experience.js";
   </aside>
 </section>
 
+<section class="career-map" aria-labelledby="map-title">
+  <div class="section-label">01 / CAREER MAP</div>
+  <div class="map-intro"><h2 id="map-title">Explore my career.</h2><p>Choose a path. Each node expands into the work behind it.</p></div>
+  <div class="bubble-field">
+    <button class="bubble bubble-projects is-active" data-panel="projects">PROJECTS</button>
+    <button class="bubble bubble-experience" data-panel="experience">EXPERIENCE</button>
+    <button class="bubble bubble-games" data-panel="games">GAMES</button>
+    <button class="bubble bubble-capabilities" data-panel="capabilities">CAPABILITIES</button>
+    <button class="bubble bubble-about" data-panel="about">ABOUT</button>
+    <button class="bubble bubble-contact" data-panel="contact">CONTACT</button>
+    <div class="bubble-core">BOA</div>
+  </div>
+  <div class="map-panels">
+    <article class="map-panel is-open" data-content="projects"><div><span>SELECTED WORK</span><h3>Projects that shipped.</h3></div><a href="#work">Explore projects ↗</a></article>
+    <article class="map-panel" data-content="experience"><div><span>CAREER</span><h3>10+ years across production, PMO and games.</h3></div><a href="#career">View career timeline ↗</a></article>
+    <article class="map-panel" data-content="games"><div><span>ARCHIVE</span><h3>80+ games and interactive projects.</h3></div><a href="/Resume/games/">Open games archive ↗</a></article>
+    <article class="map-panel" data-content="capabilities"><div><span>CAPABILITIES</span><h3>Project Management · Game Production · Game Design</h3></div><p>Agile · Scrum · Kanban · PMO · Product Delivery · Stakeholder Management · Risk Management</p></article>
+    <article class="map-panel" data-content="about"><div><span>ABOUT</span><h3>Creative thinking, structured delivery.</h3></div><p>Based in São Paulo, Brazil. Working across games, digital products, events and creative operations.</p></article>
+    <article class="map-panel" data-content="contact"><div><span>CONTACT</span><h3>Let's build something.</h3></div><a href="#contact">Get in touch ↗</a></article>
+  </div>
+</section>
+
 <section class="section" id="about">
   <div class="section-label">01 / Positioning</div>
   <p class="statement">I bridge <em>creative vision</em> and <em>structured delivery</em> — from strategy and planning to production, teams, stakeholders and release.</p>
@@ -146,10 +168,25 @@ import { experience } from "../data/experience.js";
   .contact{grid-template-columns:1fr;gap:35px}.contact h2{font-size:58px}
 }
 @media(prefers-reduced-motion:reduce){.work-card,.project-media img,.client-logo img{transition:none}}
+
+.career-map{padding:92px 0 36px;border-top:1px solid rgba(166,236,188,.16)}
+.map-intro{display:flex;justify-content:space-between;align-items:end;gap:30px;margin:18px 0 34px}.map-intro h2{font-size:clamp(38px,5vw,72px);margin:0;letter-spacing:-.05em}.map-intro p{max-width:320px;color:#9ba8a0;margin:0}
+.bubble-field{position:relative;min-height:440px;border:1px solid rgba(166,236,188,.18);border-radius:32px;overflow:hidden;background:radial-gradient(circle at center,rgba(122,255,160,.10),transparent 28%),linear-gradient(135deg,#151b18,#0c100f)}
+.bubble{position:absolute;z-index:2;border:1px solid rgba(166,236,188,.45);background:rgba(20,28,24,.78);color:#e9f4ed;border-radius:999px;padding:20px 28px;letter-spacing:.12em;font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:.35s ease;box-shadow:0 15px 45px rgba(0,0,0,.2);animation:careerFloat 6s ease-in-out infinite}.bubble:hover,.bubble:focus-visible,.bubble.is-active{transform:scale(1.08);border-color:#a6ecbc;box-shadow:0 0 30px rgba(166,236,188,.16)}
+.bubble-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:105px;height:105px;border-radius:50%;display:grid;place-items:center;border:1px solid #a6ecbc;background:#111714;color:#a6ecbc;letter-spacing:.18em;font-weight:700;box-shadow:0 0 50px rgba(166,236,188,.08)}
+.bubble-projects{left:10%;top:18%;animation-delay:-1s}.bubble-experience{right:9%;top:20%;animation-delay:-3s}.bubble-games{left:7%;bottom:16%;animation-delay:-4s}.bubble-capabilities{right:7%;bottom:17%;animation-delay:-2s}.bubble-about{left:39%;top:8%;animation-delay:-5s}.bubble-contact{right:34%;bottom:7%;animation-delay:-1.5s}
+@keyframes careerFloat{50%{translate:0 -8px}}
+.map-panels{margin-top:16px}.map-panel{display:none;align-items:end;justify-content:space-between;gap:25px;padding:26px;border:1px solid rgba(166,236,188,.18);background:#151b18;border-radius:18px}.map-panel.is-open{display:flex}.map-panel span{font-size:10px;letter-spacing:.16em;color:#a6ecbc}.map-panel h3{font-size:clamp(22px,3vw,38px);margin:8px 0 0;letter-spacing:-.03em}.map-panel p{max-width:560px;color:#aab7af;margin:0}.map-panel a{color:#e9f4ed;text-decoration:none;white-space:nowrap}
+@media(max-width:700px){.career-map{padding:66px 0 26px}.map-intro{display:block;margin-bottom:24px}.map-intro h2{font-size:42px}.map-intro p{margin-top:10px}.bubble-field{min-height:370px;border-radius:24px}.bubble{padding:15px 18px;font-size:10px}.bubble-core{width:80px;height:80px;font-size:11px}.bubble-projects{left:6%;top:18%}.bubble-experience{right:5%;top:26%}.bubble-games{left:7%;bottom:18%}.bubble-capabilities{right:4%;bottom:25%}.bubble-about{left:34%;top:7%}.bubble-contact{right:29%;bottom:7%}.map-panel{flex-direction:column;align-items:flex-start;padding:20px}.map-panel h3{font-size:25px}.map-panel a{white-space:normal}}
+@media(prefers-reduced-motion:reduce){.bubble{animation:none;transition:none}}
 </style>
 
 <script>
 const filters=document.querySelectorAll("[data-filter]"),cards=document.querySelectorAll(".work-card");
 filters.forEach(f=>f.addEventListener("click",()=>{filters.forEach(x=>x.classList.remove("active"));f.classList.add("active");const t=f.dataset.filter;cards.forEach(c=>c.style.display=t==="all"||c.dataset.type===t?"flex":"none")}));
+
+const careerBubbles=document.querySelectorAll(".career-map .bubble");
+const careerPanels=document.querySelectorAll(".career-map .map-panel");
+careerBubbles.forEach((bubble)=>bubble.addEventListener("click",()=>{const key=bubble.dataset.panel;careerBubbles.forEach(x=>x.classList.toggle("is-active",x===bubble));careerPanels.forEach(p=>p.classList.toggle("is-open",p.dataset.content===key));const panel=document.querySelector('[data-content="'+key+'"]');if(window.innerWidth<701&&panel)panel.scrollIntoView({behavior:"smooth",block:"nearest"});}));
 </script>
 </Layout>
