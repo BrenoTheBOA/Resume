@@ -27,8 +27,8 @@ const artwork = {
 
   <div class="name" id="name">
     <div class="title-wrap">
-      <span class="boa-initial" aria-hidden="true"><span>B</span><span>O</span><span>A</span></span>
-      <h1 class="full-name" aria-label="Breno de Oliveira Almeida"><span>B</span>reno <span>d</span>e <span>O</span>liveira <span>A</span>lmeida</h1>
+      <span class="boa-initial" aria-hidden="true"><span class="upper">B</span><span class="upper">O</span><span class="upper">A</span></span>
+      <h1 class="full-name" aria-label="Breno de Oliveira Almeida"><span class="upper">B</span>reno <span class="upper">d</span>e <span class="upper">O</span>liveira <span class="upper">A</span>lmeida</h1>
     </div>
   </div>
 
@@ -134,7 +134,7 @@ const artwork = {
 (() => {
   const orbit=document.getElementById("orbit"), mini=document.getElementById("mini"), name=document.getElementById("name"), home=document.getElementById("home");
   const sections=[...document.querySelectorAll(".section")], bubbles=[...document.querySelectorAll(".bubble")];
-  let selected=null, pressTimer=null, drag=null, suppress=0, opening=false;
+  let selectedBubble=null, pressTimer=null, drag=null, suppressClickUntil=0, openingSection=false;
 
   function expand(){name.classList.remove("collapsing");name.classList.add("expanded")}
   function collapse(){name.classList.remove("expanded");name.classList.add("collapsing")}
@@ -148,20 +148,82 @@ const artwork = {
     setTimeout(()=>{w.classList.remove("returning");w.style.removeProperty("--return-x");w.style.removeProperty("--return-y");b.style.removeProperty("--dx");b.style.removeProperty("--dy")},850);
   }
 
-  function clearSelected(){
-    if(!selected)return;
-    const w=selected.parentElement;
-    if(w.parentElement!==orbit)orbit.appendChild(w);
-    w.classList.remove("selected-bubble","title-bubble","arriving","landed","returning-title");
-    w.style.removeProperty("--from-x");w.style.removeProperty("--from-y");
-    selected.style.removeProperty("--dx");selected.style.removeProperty("--dy");
-    selected=null;
+  function clearSelectedBubble(){
+    if(!selectedBubble)return;
+    const wrapper=selectedBubble.parentElement;
+    if(wrapper && wrapper.parentElement && !wrapper.parentElement.matches("#orbit")){
+      orbit.appendChild(wrapper);
+    }
+    wrapper?.classList.remove("selected-bubble","title-bubble","arriving","returning-title","dragging","morphing","landed");
+    wrapper?.style.removeProperty("--from-x");
+    wrapper?.style.removeProperty("--from-y");
+    selectedBubble.classList.remove("dragging","returning");
+    selectedBubble.style.removeProperty("--dx");
+    selectedBubble.style.removeProperty("--dy");
+    selectedBubble=null;
   }
 
-  function homeState(){
-    clearSelected();sections.forEach(s=>s.classList.add("collapsed"));
-    orbit.classList.remove("scrolled","transitioning","returning-home");mini.classList.remove("visible");expand();
+  function restoreHome(){
+    clearSelectedBubble();
+    sections.forEach(section=>{
+      section.classList.add("collapsed");
+      section.classList.remove("has-morph-title");
+      section.querySelector(".section-head")?.classList.remove("has-selected-bubble");
+    });
+    orbit.classList.remove("scrolled","transitioning","returning-home");
+    orbit.style.opacity="1";
+    mini.classList.remove("visible");
+    expand();
     window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  function returnToHomeManually(){
+    const chosen=selectedBubble;
+    sections.forEach(section=>{
+      section.classList.add("collapsed");
+      section.classList.remove("has-morph-title");
+      section.querySelector(".section-head")?.classList.remove("has-selected-bubble");
+    });
+    orbit.classList.remove("scrolled","transitioning");
+    orbit.classList.add("returning-home");
+    orbit.style.opacity="1";
+    mini.classList.remove("visible");
+
+    if(!chosen){ restoreHome(); return; }
+
+    const wrapper=chosen.parentElement;
+    const sourceRect=wrapper.getBoundingClientRect();
+    orbit.appendChild(wrapper);
+
+    const targetRect=wrapper.getBoundingClientRect();
+    const dx=sourceRect.left-targetRect.left+(sourceRect.width-targetRect.width)/2;
+    const dy=sourceRect.top-targetRect.top+(sourceRect.height-targetRect.height)/2;
+
+    wrapper.classList.remove("arriving","landed");
+    wrapper.classList.add("selected-bubble","returning-title");
+    wrapper.style.setProperty("--from-x",dx+"px");
+    wrapper.style.setProperty("--from-y",dy+"px");
+    chosen.style.setProperty("--dx","0px");
+    chosen.style.setProperty("--dy","0px");
+
+    requestAnimationFrame(()=>wrapper.classList.add("returning-title"));
+
+    window.setTimeout(()=>{
+      bubbles.forEach(bubble=>{
+        const w=bubble.parentElement;
+        w.classList.remove("selected-bubble","returning-title","title-bubble","arriving","landed","dragging","morphing");
+        w.style.removeProperty("opacity");
+        w.style.removeProperty("pointer-events");
+        w.style.removeProperty("transform");
+        bubble.style.removeProperty("--dx");
+        bubble.style.removeProperty("--dy");
+      });
+      orbit.classList.remove("returning-home","scrolled","transitioning");
+      orbit.style.opacity="1";
+      selectedBubble=null;
+      expand();
+      window.scrollTo({top:0,behavior:"smooth"});
+    },1320);
   }
 
   function openSection(id){
@@ -169,37 +231,33 @@ const artwork = {
     const target=document.getElementById("section-"+id);
     if(!chosen||!target)return;
 
-    if(selected&&selected!==chosen)clearSelected();
+    if(selectedBubble&&selectedBubble!==chosen)clearSelectedBubble();
 
-    opening=true;
+    openingSection=true;
     collapse();
-    selected=chosen;
+    selectedBubble=chosen;
 
     const wrapper=chosen.parentElement;
     const sourceRect=wrapper.getBoundingClientRect();
     const head=target.querySelector(".section-head");
+    const titleBox=head?.querySelector(":scope > div");
     const title=head?.querySelector("h2");
-    const titleBox=head?.querySelector(":scope > div:nth-child(2)");
     if(!head||!titleBox||!title)return;
 
-    // This mirrors the original V29 navigation sequence:
-    // reveal the page, keep the opening state alive while the browser scrolls,
-    // then land the clicked bubble in that page's title.
     sections.forEach(section=>{
       const active=section===target;
       section.classList.toggle("collapsed",!active);
+      section.classList.toggle("has-morph-title",active);
+      section.querySelector(".section-head")?.classList.toggle("has-selected-bubble",active);
     });
 
     orbit.classList.add("scrolled","transitioning");
     title.style.display="none";
 
-    // First scroll pass: once the target has been laid out.
     window.setTimeout(()=>{
-      const top=target.getBoundingClientRect().top+window.scrollY;
-      window.scrollTo({left:0,top:Math.max(0,top),behavior:"smooth"});
+      target.scrollIntoView({behavior:"smooth",block:"start"});
     },500);
 
-    // Move the actual clicked bubble into the target title.
     titleBox.insertBefore(wrapper,title);
     wrapper.classList.remove("selected-bubble");
     wrapper.classList.add("title-bubble","arriving");
@@ -218,18 +276,11 @@ const artwork = {
       wrapper.style.removeProperty("--from-x");
       wrapper.style.removeProperty("--from-y");
       orbit.classList.remove("transitioning");
-
-      // Second scroll pass after the bubble has become part of the section.
-      const top=target.getBoundingClientRect().top+window.scrollY;
-      window.scrollTo({left:0,top:Math.max(0,top),behavior:"smooth"});
+      target.scrollIntoView({behavior:"smooth",block:"start"});
+      window.setTimeout(()=>{openingSection=false;},500);
     },1420);
-
-    // Keep the opening state long enough that the scroll cannot trigger
-    // the "return home" safeguard while the page is still moving.
-    window.setTimeout(()=>{
-      opening=false;
-    },1900);
   }
+
 
   bubbles.forEach(b=>{
     b.addEventListener("pointerdown",e=>{
@@ -245,18 +296,22 @@ const artwork = {
     });
     b.addEventListener("pointerup",e=>{
       if(!drag||drag.id!==e.pointerId)return;clearTimeout(pressTimer);const d=drag;drag=null;
-      if(d.dragging){suppress=Date.now()+800;snap(d);return}
-      if(!d.moved&&Date.now()>suppress)openSection(b.dataset.section);
+      if(d.dragging){
+        suppressClickUntil=Date.now()+800;
+        snap(d);
+        return;
+      }
+      if(!d.moved&&Date.now()>suppressClickUntil)openSection(b.dataset.section);
     });
     b.addEventListener("pointercancel",()=>{if(drag?.dragging)snap(d);drag=null;clearTimeout(pressTimer)});
     b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openSection(b.dataset.section)}});
   });
 
-  mini.addEventListener("click",e=>{e.preventDefault();homeState()});
+  mini.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();returnToHomeManually()});
   window.addEventListener("scroll",()=>{
     const y=window.scrollY;
     if(y>home.offsetHeight*.3)mini.classList.add("visible");else mini.classList.remove("visible");
-    if(selected&&!opening&&y<=4)homeState();
+    if(selectedBubble&&!openingSection&&y<=4)returnToHomeManually();
   },{passive:true});
   setTimeout(expand,80);
 })();
@@ -269,11 +324,11 @@ const artwork = {
 .particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}.particles span{position:absolute;bottom:-12vh;left:var(--x);width:var(--size);height:var(--size);border-radius:50%;border:1px solid rgba(169,245,200,var(--alpha));background:radial-gradient(circle at 32% 28%,rgba(255,255,255,calc(var(--alpha)*.75)) 0 7%,rgba(169,245,200,calc(var(--alpha)*.28)) 8% 28%,rgba(169,245,200,calc(var(--alpha)*.08)) 52%,transparent 72%);box-shadow:0 0 var(--glow,18px) rgba(169,245,200,calc(var(--alpha)*.32)),inset 0 0 calc(var(--size)*.16) rgba(255,255,255,calc(var(--alpha)*.12));filter:blur(var(--blur));opacity:var(--alpha);animation:rise var(--duration) linear var(--delay) infinite,sway var(--sway) ease-in-out var(--delay) infinite alternate}
 @keyframes rise{0%{transform:translate3d(0,12vh,0) scale(.72);opacity:0}8%{opacity:var(--alpha)}72%{opacity:calc(var(--alpha)*.72)}100%{transform:translate3d(var(--drift),-125vh,0) scale(1.12);opacity:0}}
 @keyframes sway{0%{margin-left:calc(var(--sway-x)*-1)}50%{margin-left:var(--sway-x)}100%{margin-left:calc(var(--sway-x)*-.35)}}
-.name{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;text-align:center;pointer-events:none;width:auto;max-width:96vw}.title-wrap{position:relative;display:grid;place-items:center;min-width:64px;min-height:1em}.boa-initial,.full-name{grid-area:1/1;white-space:nowrap}.boa-initial{font-size:clamp(1.55rem,5.2vw,7rem);letter-spacing:-.08em;color:var(--mint);opacity:1;transform:scale(1);transition:opacity .45s ease,transform .75s cubic-bezier(.16,1.25,.3,1)}.full-name{margin:0;font-size:clamp(1.55rem,5.2vw,7rem);line-height:1;letter-spacing:-.065em;font-weight:500;opacity:0;transform:scale(.18);transform-origin:center;transition:opacity .7s ease,transform .9s cubic-bezier(.16,1.25,.3,1)}.full-name{color:var(--mint)}.full-name span{color:var(--text)}.name.expanded .boa-initial{opacity:0;transform:scale(.15)}.name.expanded .full-name{opacity:1;transform:scale(1)}.name.collapsing .full-name{opacity:0;transform:scale(.18);transition-duration:.55s}.name.collapsing .boa-initial{opacity:1;transform:scale(1);transition-duration:.7s}
+.name{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;text-align:center;pointer-events:none;width:auto;max-width:96vw}.name .upper{color:var(--text)}.name .boa-initial .upper{color:var(--text)}.title-wrap{position:relative;display:grid;place-items:center;min-width:64px;min-height:1em}.boa-initial,.full-name{grid-area:1/1;white-space:nowrap}.boa-initial{font-size:clamp(1.55rem,5.2vw,7rem);letter-spacing:-.08em;color:var(--mint);opacity:1;transform:scale(1);transition:opacity .45s ease,transform .75s cubic-bezier(.16,1.25,.3,1)}.full-name{margin:0;font-size:clamp(1.55rem,5.2vw,7rem);line-height:1;letter-spacing:-.065em;font-weight:500;opacity:0;transform:scale(.18);transform-origin:center;transition:opacity .7s ease,transform .9s cubic-bezier(.16,1.25,.3,1)}.full-name{color:var(--mint)}.name.expanded .boa-initial{opacity:0;transform:scale(.15)}.name.expanded .full-name{opacity:1;transform:scale(1)}.name.collapsing .full-name{opacity:0;transform:scale(.18);transition-duration:.55s}.name.collapsing .boa-initial{opacity:1;transform:scale(1);transition-duration:.7s}
 .orbit{position:absolute;inset:0;z-index:10;pointer-events:none}.float{position:absolute;width:clamp(82px,9vw,116px);aspect-ratio:1;pointer-events:auto;animation:float 5s ease-in-out infinite}.float.about{left:7%;top:13%}.float.experience{right:7%;top:14%;animation-delay:-1.2s}.float.projects{left:8%;bottom:13%;animation-delay:-2.2s}.float.skills{right:8%;bottom:14%;animation-delay:-3.1s}.float.contact{left:50%;top:7%;margin-left:calc(clamp(82px,9vw,116px)/-2);animation-delay:-1.8s}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
 .bubble{width:100%;height:100%;border:1px solid rgba(169,245,200,.65);border-radius:50%;background:rgba(8,23,16,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--mint);display:flex;align-items:center;justify-content:center;text-align:center;font-size:clamp(.62rem,1vw,.78rem);font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;user-select:none;touch-action:none;will-change:transform;transition:transform .25s ease,background .25s ease,border-color .25s ease,box-shadow .25s ease}.bubble:hover{background:rgba(169,245,200,.1);border-color:var(--mint);box-shadow:0 0 35px rgba(169,245,200,.12)}.bubble.dragging{cursor:grabbing;transform:translate3d(var(--dx,0),var(--dy,0),0) scale(1.12);box-shadow:0 20px 50px rgba(0,0,0,.35);transition:none}.float.dragging{animation:none;z-index:50}.float.returning .bubble{animation:snapback .82s cubic-bezier(.16,1.25,.3,1) forwards!important;transition:none!important}@keyframes snapback{0%{transform:translate3d(var(--return-x),var(--return-y),0) scale(1.12)}42%{transform:translate3d(calc(var(--return-x)*-.1),calc(var(--return-y)*-.1),0) scale(1.07)}68%{transform:translate3d(calc(var(--return-x)*.025),calc(var(--return-y)*.025),0) scale(.97)}84%{transform:translate3d(calc(var(--return-x)*-.008),calc(var(--return-y)*-.008),0) scale(1.02)}100%{transform:translate3d(0,0,0) scale(1)}}
-.orbit.scrolled .float:not(.title-bubble){opacity:0;pointer-events:none;transform:scale(.72);transition:opacity .55s ease,transform .75s cubic-bezier(.16,1,.3,1)}.orbit.transitioning .float:not(.title-bubble){opacity:0!important;pointer-events:none}.title-bubble{position:relative!important;inset:auto!important;width:clamp(118px,18vw,156px)!important;height:clamp(118px,18vw,156px)!important;margin:8px 0 28px!important;display:block!important;animation:arrive 1.35s cubic-bezier(.16,1.25,.3,1) forwards;z-index:20;pointer-events:none}.title-bubble .bubble{pointer-events:none;cursor:default;font-size:clamp(.72rem,1.3vw,.9rem);box-shadow:0 0 38px rgba(169,245,200,.08),0 18px 55px rgba(0,0,0,.22)}@keyframes arrive{0%{opacity:.9;transform:translate3d(var(--from-x),var(--from-y),0) scale(.38) rotate(-8deg)}48%{opacity:1;transform:translate3d(calc(var(--from-x)*.16),calc(var(--from-y)*.16),0) scale(1.1) rotate(3deg)}68%{transform:translate3d(0,0,0) scale(.94) rotate(-1.5deg)}84%{transform:translate3d(0,0,0) scale(1.045) rotate(.8deg)}94%{transform:translate3d(0,0,0) scale(.985)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+.orbit.scrolled .float:not(.title-bubble){opacity:0;pointer-events:none;transform:scale(.72);transition:opacity .55s ease,transform .75s cubic-bezier(.16,1,.3,1)}.section-head{position:relative}.section-head>div{position:relative}.section-head h2{display:none!important}.section-head.has-selected-bubble .page-icon{background:transparent;border-color:transparent}.section-head .title-bubble{position:relative!important;inset:auto!important;width:clamp(118px,18vw,156px)!important;height:clamp(118px,18vw,156px)!important;aspect-ratio:1!important;margin:8px 0 28px!important;display:block!important;animation:none!important;z-index:20;pointer-events:none;transform-origin:center}.section-head .title-bubble .bubble{width:100%;height:100%;padding:0;border:1px solid rgba(169,245,200,.72);border-radius:50%;background:rgba(8,23,16,.72);box-shadow:0 0 0 1px rgba(169,245,200,.05) inset,0 0 38px rgba(169,245,200,.08),0 18px 55px rgba(0,0,0,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--mint);font-size:clamp(.72rem,1.3vw,.9rem);line-height:1;font-weight:500;letter-spacing:.14em;text-transform:uppercase;justify-content:center;pointer-events:none;cursor:default;transition:none;transform-origin:center}.section-head .title-bubble.arriving{animation:juicyTitleWrapper 1.35s cubic-bezier(.16,1.25,.3,1) forwards}.section-head .title-bubble.arriving .bubble{animation:juicyTitleBubble 1.35s cubic-bezier(.16,1.25,.3,1) forwards}@keyframes juicyTitleWrapper{0%{opacity:.9;transform:translate3d(var(--from-x),var(--from-y),0) scale(.38) rotate(-8deg)}48%{opacity:1;transform:translate3d(calc(var(--from-x)*.16),calc(var(--from-y)*.16),0) scale(1.1) rotate(3deg)}68%{transform:translate3d(0,0,0) scale(.94) rotate(-1.5deg)}84%{transform:translate3d(0,0,0) scale(1.045) rotate(.8deg)}94%{transform:translate3d(0,0,0) scale(.985)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}@keyframes juicyTitleBubble{0%{transform:scale(.7)}48%{transform:scale(1.04)}68%{transform:scale(.96)}84%{transform:scale(1.02)}100%{transform:scale(1)}}.orbit.transitioning .float:not(.title-bubble){opacity:0!important;pointer-events:none}.title-bubble{position:relative!important;inset:auto!important;width:clamp(118px,18vw,156px)!important;height:clamp(118px,18vw,156px)!important;margin:8px 0 28px!important;display:block!important;animation:arrive 1.35s cubic-bezier(.16,1.25,.3,1) forwards;z-index:20;pointer-events:none}.title-bubble .bubble{pointer-events:none;cursor:default;font-size:clamp(.72rem,1.3vw,.9rem);box-shadow:0 0 38px rgba(169,245,200,.08),0 18px 55px rgba(0,0,0,.22)}@keyframes arrive{0%{opacity:.9;transform:translate3d(var(--from-x),var(--from-y),0) scale(.38) rotate(-8deg)}48%{opacity:1;transform:translate3d(calc(var(--from-x)*.16),calc(var(--from-y)*.16),0) scale(1.1) rotate(3deg)}68%{transform:translate3d(0,0,0) scale(.94) rotate(-1.5deg)}84%{transform:translate3d(0,0,0) scale(1.045) rotate(.8deg)}94%{transform:translate3d(0,0,0) scale(.985)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
 .title-bubble.landed{animation:sectionFloat 5.2s ease-in-out infinite!important}.title-bubble.landed .bubble{animation:pulse 5.2s ease-in-out infinite!important}@keyframes sectionFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}@keyframes pulse{50%{transform:scale(1.018)}}
 .scrollbar{position:fixed;top:0;left:0;right:0;height:74px;z-index:100;pointer-events:none}.mini{position:absolute;top:15px;left:50%;transform:translateX(-50%) scale(.8);width:52px;height:52px;border:1px solid rgba(169,245,200,.65);border-radius:50%;background:rgba(8,23,16,.88);color:var(--mint);display:flex;align-items:center;justify-content:center;font-weight:600;letter-spacing:.08em;cursor:pointer;pointer-events:auto;opacity:0;visibility:hidden;transition:.35s;backdrop-filter:blur(12px)}.mini.visible{opacity:1;visibility:visible;transform:translateX(-50%) scale(1)}
 .content{width:100%;max-width:960px;margin:0 auto;padding:0 24px}.section{min-height:100vh;padding:110px 0 80px}.section.collapsed{display:none}.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:42px}.section-head>div:nth-child(2){position:relative}.section-head h2{margin:0;font-size:clamp(2.5rem,7vw,5.5rem);line-height:.9;letter-spacing:-.07em;font-weight:500}.section-intro{max-width:760px;margin:0 0 46px;color:var(--muted);font-size:clamp(1.05rem,2vw,1.55rem);line-height:1.45}.page-icon{width:58px;height:58px;display:grid;place-items:center;border:1px solid rgba(169,245,200,.28);border-radius:18px;background:rgba(169,245,200,.035);color:var(--mint);margin:4px 0 26px}.page-icon svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
